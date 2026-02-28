@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atelier Forma | Luxury Interior Studio</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- FontAwesome for Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- 1. Animated Loading Screen -->
+    <div id="loader" class="loader-container">
+      <div class="loader-content">
+        <h1 class="loader-brand">Your Firm Name Will Come Here</h1>
+        <div class="loader-line"></div>
+      </div>
+    </div>
+
+    <!-- 2. Sticky Navbar -->
+    <header id="navbar" class="navbar">
+      <div class="container nav-container">
+        <a href="#" class="logo">Your Firm Name Will Come Here</a>
+
+        <button class="menu-toggle" aria-label="Toggle Menu">
+          <span class="hamburger"></span>
+        </button>
+
+        <nav class="nav-links">
+          <a href="#home" class="nav-link active">Home</a>
+          <a href="#about" class="nav-link">About</a>
+          <a href="#services" class="nav-link">Services</a>
+          <a href="#portfolio" class="nav-link">Portfolio</a>
+          <a href="#process" class="nav-link">Process</a>
+          <a href="#contact" class="nav-link">Contact</a>
+
+          <!-- Dark/Light Mode Toggle -->
+          <button
+            id="theme-toggle"
+            class="theme-toggle"
+            aria-label="Toggle Dark Mode"
+          >
+            <i class="fas fa-moon dark-icon"></i>
+            <i class="fas fa-sun light-icon"></i>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <!-- 3. Hero Section -->
+      <section id="home" class="hero-section">
+        <div class="hero-bg parallax-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+          <h1 class="hero-title">
+            <span class="reveal-text">Designing</span>
+            <span class="reveal-text">Timeless</span>
+            <span class="reveal-text">Spaces</span>
+          </h1>
+          <p class="hero-subtitle reveal-element delay-1">
+            Your Firm's Philosophy Will come here.
+          </p>
+          <div class="hero-actions reveal-element delay-2">
+            <a href="#portfolio" class="btn btn-primary ripple"
+              >View Our Work</a
+            >
+            <a href="#contact" class="btn btn-outline ripple">Contact Us</a>
+          </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <a href="#about" class="scroll-indicator">
+          <span class="scroll-text">Scroll</span>
+          <div class="scroll-line"></div>
+        </a>
+      </section>
+
+      <!-- 4. About Section -->
+      <section id="about" class="about-section pt-120 pb-120">
+        <div class="container">
+          <div class="about-grid">
+            <div class="about-image-wrapper reveal-fade-up">
+              <div class="about-image parallax-img"></div>
+              <div class="experience-badge">
+                <span class="badge-num counter" data-target="15">0</span>
+                <span class="badge-text">Years of<br />Excellence</span>
+              </div>
+            </div>
+            <div class="about-text-content reveal-fade-right delay-1">
+              <span class="section-subtitle">Our Story</span>
+              <h2 class="section-title">
+                Elevating the Art of Interior Design
+              </h2>
+              <p>
+                Your Firm Philosophy will come here
+              </p>
+              <p>
+              </p>
+
+              <div class="stats-container">
+                <div class="stat-item">
+                  <h3 class="stat-number">
+                    <span class="counter" data-target="250">0</span>+
+                  </h3>
+                  <p class="stat-label">Projects Completed</p>
+                </div>
+                <div class="stat-item">
+                  <h3 class="stat-number">
+                    <span class="counter" data-target="40">0</span>+
+                  </h3>
+                  <p class="stat-label">Industry Awards</p>
+                </div>
+                <div class="stat-item">
+                  <h3 class="stat-number">
+                    <span class="counter" data-target="12">0</span>
+                  </h3>
+                  <p class="stat-label">Global Presence</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Services Section -->
+      <section id="services" class="services-section pt-120 pb-120 bg-alt">
+        <div class="container">
+          <div class="section-header text-center reveal-fade-up">
+            <span class="section-subtitle">Expertise</span>
+            <h2 class="section-title">Bespoke Design Services</h2>
+          </div>
+
+          <div class="services-grid">
+            <div class="service-card reveal-fade-up">
+              <div class="service-icon"><i class="fas fa-couch"></i></div>
+              <h3 class="service-title">Interior Design</h3>
+              <p class="service-desc">
+                Comprehensive luxury interior design, from spatial planning to
+                custom furnishings and styling.
+              </p>
+              <div class="service-hover-glow"></div>
+            </div>
+
+            <div class="service-card reveal-fade-up delay-1">
+              <div class="service-icon"><i class="fas fa-building"></i></div>
+              <h3 class="service-title">Architecture</h3>
+              <p class="service-desc">
+                Architectural planning and vision that harmonizes structure with
+                surrounding environments.
+              </p>
+              <div class="service-hover-glow"></div>
+            </div>
+
+            <div class="service-card reveal-fade-up delay-2">
+              <div class="service-icon"><i class="fas fa-hammer"></i></div>
+              <h3 class="service-title">Renovation</h3>
+              <p class="service-desc">
+                Transforming existing spaces into modern masterpieces with
+                respect for heritage and flow.
+              </p>
+              <div class="service-hover-glow"></div>
+            </div>
+
+            <div class="service-card reveal-fade-up delay-3">
+              <div class="service-icon"><i class="fas fa-city"></i></div>
+              <h3 class="service-title">Urban Planning</h3>
+              <p class="service-desc">
+                Master planning that shapes communities with sustainable,
+                forward-thinking urban solutions.
+              </p>
+              <div class="service-hover-glow"></div>
+            </div>
+
+            <div class="service-card reveal-fade-up delay-4">
+              <div class="service-icon"><i class="fas fa-leaf"></i></div>
+              <h3 class="service-title">Landscape</h3>
+              <p class="service-desc">
+                Integrating natural elements seamlessly with architectural forms
+                to create tranquil outdoor retreats.
+              </p>
+              <div class="service-hover-glow"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Portfolio Section -->
+      <section id="portfolio" class="portfolio-section pt-120 pb-120">
+        <div class="container">
+          <div class="section-header reveal-fade-up">
+            <div class="header-flex">
+              <div>
+                <span class="section-subtitle">Selected Works</span>
+                <h2 class="section-title">A Curated Portfolio</h2>
+              </div>
+              <div class="portfolio-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="residential">
+                  Residential
+                </button>
+                <button class="filter-btn" data-filter="commercial">
+                  Commercial
+                </button>
+                <button class="filter-btn" data-filter="hospitality">
+                  Hospitality
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="portfolio-masonry">
+            <!-- Project 1 -->
+            <div class="portfolio-item residential reveal-fade-up">
+              <div class="portfolio-img-wrapper">
+                <div
+                  class="portfolio-bg"
+                  style="
+                    background-image: url('images/firm.jpg');
+                  "
+                ></div>
+                <div class="portfolio-overlay">
+                  <div class="portfolio-info">
+                    <span class="project-category">Residential</span>
+                    <h3 class="project-title">The Azure Penthouse</h3>
+                  </div>
+                  <button class="view-project-btn">
+                    <i class="fas fa-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Project 2 -->
+            <div class="portfolio-item hospitality reveal-fade-up delay-1">
+              <div class="portfolio-img-wrapper">
+                <div
+                  class="portfolio-bg"
+                  style="
+                    background-image: url('images/firm.jpg');
+                  "
+                ></div>
+                <div class="portfolio-overlay">
+                  <div class="portfolio-info">
+                    <span class="project-category">Hospitality</span>
+                    <h3 class="project-title">Lumina Hotel Lobby</h3>
+                  </div>
+                  <button class="view-project-btn">
+                    <i class="fas fa-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="portfolio-item commercial reveal-fade-up">
+              <div class="portfolio-img-wrapper">
+                <div
+                  class="portfolio-bg"
+                  style="
+                    background-image: url('images/firm.jpg');
+                  "
+                ></div>
+                <div class="portfolio-overlay">
+                  <div class="portfolio-info">
+                    <span class="project-category">Commercial</span>
+                    <h3 class="project-title">Nexus Tech Headquarters</h3>
+                  </div>
+                  <button class="view-project-btn">
+                    <i class="fas fa-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Project 4 -->
+            <div class="portfolio-item residential reveal-fade-up delay-1">
+              <div class="portfolio-img-wrapper">
+                <div
+                  class="portfolio-bg"
+                  style="
+                    background-image: url('images/firm.jpg');
+                  "
+                ></div>
+                <div class="portfolio-overlay">
+                  <div class="portfolio-info">
+                    <span class="project-category">Residential</span>
+                    <h3 class="project-title">Minimalist Haven</h3>
+                  </div>
+                  <button class="view-project-btn">
+                    <i class="fas fa-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Process Section -->
+      <section id="process" class="process-section pt-120 pb-120 bg-alt">
+        <div class="container">
+          <div class="section-header text-center reveal-fade-up">
+            <span class="section-subtitle">How We Work</span>
+            <h2 class="section-title">The Design Journey</h2>
+          </div>
+
+          <div class="timeline-container reveal-fade-up">
+            <div class="timeline-progress-bar">
+              <div class="timeline-progress-fill" id="timeline-fill"></div>
+            </div>
+
+            <div class="timeline">
+              <div class="timeline-step">
+                <div class="step-dot"></div>
+                <h3 class="step-title">1. Concept</h3>
+                <p class="step-desc">
+                  Initial consultation, inspiration gathering, and developing
+                  the core aesthetic vision.
+                </p>
+              </div>
+
+              <div class="timeline-step">
+                <div class="step-dot"></div>
+                <h3 class="step-title">2. Planning</h3>
+                <p class="step-desc">
+                  Detailed spatial planning, material selection, and 3D
+                  architectural renderings.
+                </p>
+              </div>
+
+              <div class="timeline-step">
+                <div class="step-dot"></div>
+                <h3 class="step-title">3. Design Dev</h3>
+                <p class="step-desc">
+                  Refining technical drawings, procurement, and finalizing
+                  custom millwork designs.
+                </p>
+              </div>
+
+              <div class="timeline-step">
+                <div class="step-dot"></div>
+                <h3 class="step-title">4. Execution</h3>
+                <p class="step-desc">
+                  On-site project management, construction oversight, and
+                  quality control.
+                </p>
+              </div>
+
+              <div class="timeline-step">
+                <div class="step-dot"></div>
+                <h3 class="step-title">5. Handover</h3>
+                <p class="step-desc">
+                  Final styling, white-glove installation, and delivering the
+                  finished masterpiece.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Testimonials Section -->
+      <section class="testimonials-section pt-120 pb-120">
+        <div class="container">
+          <div class="testimonial-carousel reveal-fade-up">
+            <div class="carousel-track-container">
+              <ul class="carousel-track">
+                <li class="carousel-slide current-slide">
+                  <div class="testimonial-content">
+                    <div class="quote-icon">
+                      <i class="fas fa-quote-left"></i>
+                    </div>
+                    <p class="testimonial-text">
+                      "Atelier Forma transformed our penthouse into a sanctuary
+                      of modern luxury. Their attention to detail and ability to
+                      source unique materials exceeded all our expectations."
+                    </p>
+                    <h4 class="client-name">Eleanor Vance</h4>
+                    <span class="client-role">Private Residence, New York</span>
+                  </div>
+                </li>
+                <li class="carousel-slide">
+                  <div class="testimonial-content">
+                    <div class="quote-icon">
+                      <i class="fas fa-quote-left"></i>
+                    </div>
+                    <p class="testimonial-text">
+                      "The visionary design for our flagship boutique perfectly
+                      captured our brand identity. The flow and ambiance they
+                      created directly impacted our customer experience."
+                    </p>
+                    <h4 class="client-name">Marcus Sterling</h4>
+                    <span class="client-role">CEO, Aurelia Fashion</span>
+                  </div>
+                </li>
+                <li class="carousel-slide">
+                  <div class="testimonial-content">
+                    <div class="quote-icon">
+                      <i class="fas fa-quote-left"></i>
+                    </div>
+                    <p class="testimonial-text">
+                      "Pioneering architecture combined with exquisite interior
+                      aesthetics. The team at Atelier Forma are true artists who
+                      understand both form and profound function."
+                    </p>
+                    <h4 class="client-name">Sarah Jenkins</h4>
+                    <span class="client-role"
+                      >Developer, The Horizon Group</span
+                    >
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Carousel Controls -->
+            <div class="carousel-nav">
+              <button class="carousel-button carousel-button-left">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <div class="carousel-dots">
+                <button class="carousel-dot current-slide"></button>
+                <button class="carousel-dot"></button>
+                <button class="carousel-dot"></button>
+              </div>
+              <button class="carousel-button carousel-button-right">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. Contact Section -->
+      <section id="contact" class="contact-section pt-120 pb-120 bg-alt">
+        <div class="container">
+          <div class="contact-grid">
+            <div class="contact-info reveal-fade-right">
+              <span class="section-subtitle">Get in Touch</span>
+              <h2 class="section-title">Start Your Project</h2>
+              <p class="contact-desc">
+                Ready to craft a space that defines the future? Reach out to our
+                team of specialists to discuss your vision.
+              </p>
+
+              <div class="contact-details">
+                <div class="contact-item">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <div>
+                    <h4>Headquarters</h4>
+                    <p>Your Address Will Come Here<br />Your City, State, Zip</p>
+                  </div>
+                </div>
+                <div class="contact-item">
+                  <i class="fas fa-phone-alt"></i>
+                  <div>
+                    <h4>Phone</h4>
+                    <p>Your Phone Number Will Come Here</p>
+                  </div>
+                </div>
+                <div class="contact-item">
+                  <i class="fas fa-envelope"></i>
+                  <div>
+                    <h4>Email</h4>
+                    <p>Your Email Address Will Come Here</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+      </section>
+    </main>
+
+    <!-- 10. Footer -->
+    <footer class="footer pt-80 pb-40">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <h2>Your Firm Name</h2>
+            <p>
+              Your Firm's Philosophy Will come here.
+            </p>
+          </div>
+
+          <div class="footer-links">
+            <h3>Explore</h3>
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#services">Services</a></li>
+              <li><a href="#portfolio">Our Work</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-links">
+            <h3>Legal</h3>
+            <ul>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-social">
+            <h3>Connect</h3>
+            <div class="social-icons">
+              <a href="#" aria-label="Instagram"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a href="#" aria-label="LinkedIn"
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+              <a href="#" aria-label="Pinterest"
+                ><i class="fab fa-pinterest-p"></i
+              ></a>
+              <a href="#" aria-label="Behance"
+                ><i class="fab fa-behance"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>
+            &copy; <span id="year"></span> Your Firm Name. All Rights Reserved.
+          </p>
+          <button id="backToTop" class="back-to-top" aria-label="Back to Top">
+            <i class="fas fa-arrow-up"></i>
+          </button>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/script.js"></script>
+  </body>
+</html>
