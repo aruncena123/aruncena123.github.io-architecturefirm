@@ -199,6 +199,14 @@ input,select,textarea{font-family:inherit;font-size:13px;}
 .badge-empirical{background:var(--ok-soft);color:var(--ok);}
 .badge-participant{background:#f1e9fb;color:var(--purple);}
 .badge-warning{background:var(--warn-soft);color:var(--warn);}
+.badge-population{background:#f1e9fb;color:var(--purple);cursor:help;text-transform:none;letter-spacing:0;font-weight:600;}
+
+.population-card{border-left:3px solid var(--purple);}
+
+.glossary{margin:0;font-size:12.5px;}
+.glossary dt{font-weight:700;color:var(--text-primary);margin-top:10px;}
+.glossary dt:first-child{margin-top:0;}
+.glossary dd{margin:2px 0 0;color:var(--text-secondary);}
 
 /* ===== Toolbar (space builder) ===== */
 .toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--bg-card);

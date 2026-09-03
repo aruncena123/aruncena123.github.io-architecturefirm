@@ -13,7 +13,9 @@ A virtual experimental research instrument for architecture, urban design, envir
 3. The app auto-loads a **demo study** the first time it runs (seating configuration vs. social interaction potential), so you can explore a fully populated example immediately. Everything you do is saved automatically to your browser's local storage, so closing and reopening the tab picks up where you left off.
 4. To start your own study from a clean slate: **Dataset → Project Management → Reset Project** (this asks for confirmation first).
 
-The app works fully offline and stores data only in your browser (`localStorage`). Nothing is sent anywhere. To move a study between computers or share it with a collaborator, use **Export All Project Data** / **Import Project Data** (see §5).
+The app works fully offline and stores data only in your browser (`localStorage`). Nothing is sent anywhere. To move a study between computers or share it with a collaborator, use **Export All Project Data** / **Import Project Data** (see §6).
+
+**New to the terminology?** Click **? Guide** in the top-right corner at any time — it includes a plain-language glossary (Baseline/Treatment, Trial vs. Replication vs. Population, Condition, Effect Size, Correlation vs. causation, etc.) alongside the step-by-step walkthrough.
 
 ---
 
@@ -49,14 +51,28 @@ Every run automatically appends rows to the **Dataset** and entries to the **Exp
 
 ---
 
-## 4. Adding observations and participant data
+## 4. Generating a random population of layouts
+
+Below the main canvas in **Space Builder** is a **Random Population Generator** card. This is a different thing from the **🎲 Randomize This Layout** button (which reshuffles only the one space you're currently editing) and from the 10-condition **Multi-Condition** experiment tab (which is for hand-picked comparisons):
+
+- Set a **population size** (n = 3–50) and a **random seed**, then click **Generate Random Population**.
+- The app produces `n` independently randomized layouts (same geometry as your current space, but independently varied object counts, positions, and types), reproducible from the seed.
+- Every layout is automatically added to the **Dataset** as a `simulation` row (condition `Population #1`, `Population #2`, …), so it counts toward your overall dataset/population of data and is included in CSV/JSON export.
+- All population members become additional sample units in **Analysis → Correlation Explorer** and **Scenario Comparison** — this is what lets you compute a *meaningful* Pearson correlation (e.g. "tree count vs. comfort indicator") instead of one based on just 2–3 hand-built conditions.
+- Click **Preview** on any member to load it into the Space Builder canvas for inspection. Regenerating (same or different seed/count) **replaces** the previous population and its dataset rows, so re-running with different settings doesn't silently pile up duplicate rows; **Clear Population** removes it entirely.
+
+**Why this matters for research use:** a single Baseline/Treatment pair is a controlled comparison (n=1 per condition, or n=trials with stochastic simulation), which is good for testing one specific hypothesis but not for exploring broader patterns across many configurations. The random population gives you a genuine sample (n≥3, ideally 10+) to run correlational/exploratory analysis on, and — per the request that motivated this feature — those layouts are written into the shared dataset and referenced in the generated **Research Summary** and **Paper Draft** (see §8) under a "Population Sample" section, with the most recent correlation you ran included as a discussion point.
+
+---
+
+## 5. Adding observations and participant data
 
 - **Observations tab → Observation Sheet**: log researcher-entered field counts (pedestrians, seated/standing/walking, groups, interactions, comfort/safety ratings, etc.) — tagged as *researcher-entered observation*.
 - **Observations tab → Participant Responses**: run a 1–5 Likert questionnaire (default 6 questions, customizable) with anonymous participant IDs (P001, P002, …) — no personal data is collected. Each response is tagged as *participant-reported response*, kept distinct from simulated indicators and field observations.
 
 ---
 
-## 5. Exporting the dataset
+## 6. Exporting the dataset
 
 Go to the **Dataset** tab:
 
@@ -69,7 +85,7 @@ The `observation_type` column is what lets you separate **simulation** rows (mod
 
 ---
 
-## 6. Interpreting the model-based indicators
+## 7. Interpreting the model-based indicators
 
 Every indicator on the **Variables** tab (Accessibility, Walkability, Visibility, Safety Potential, Social Interaction Potential, Comfort, Privacy, Sociability, Thermal Comfort Potential, Activity Diversity, and the composite Public Space Quality Score) is a **transparent weighted formula** — click **View Calculation** on any indicator card to see its exact formula, component weights, raw values, normalized values, and contribution to the score.
 
@@ -83,13 +99,13 @@ Rules of interpretation:
 
 ---
 
-## 7. Writing a research paper with this instrument
+## 8. Writing a research paper with this instrument
 
 The **Research Report** tab turns your study into drafts you build on — it does **not** produce a publishable paper by itself.
 
-1. **Research Summary** (`Generate Research Summary`) — a plain-language summary: question, hypothesis, design, results, descriptive statistics, limitations, interpretation, suggested discussion points, and a reproducibility footer. Good for a lab notebook entry or a project status report.
-2. **Research Paper Builder** (`Generate Paper Draft`) — a structured 12-section draft (Introduction, Research Question, Hypothesis, Methodology, Experimental Setup, Variables, Results, Statistical Analysis, Discussion, Limitations, Conclusion, Reproducibility) populated from your actual study data. Use **Copy** or **Download** to move it into Word/Google Docs/LaTeX.
-3. **Reproducibility tab** — study ID, experiment ID, model version, trials, replication count, random seed, stochastic settings, dataset size, and a configuration hash. Use **Export Experiment Configuration** to save a JSON file another researcher (or you, later) can use to reproduce the exact same virtual experiment.
+1. **Research Summary** (`Generate Research Summary`) — a plain-language summary: question, hypothesis, design, results, descriptive statistics, a **Population Sample** section (when you've generated one — size, seed, and summary statistics of the Quality Score across it, plus your most recent correlation result), limitations, interpretation, suggested discussion points, and a reproducibility footer. Good for a lab notebook entry or a project status report.
+2. **Research Paper Builder** (`Generate Paper Draft`) — a structured 12-section draft (Introduction, Research Question, Hypothesis, Methodology, Experimental Setup, Variables, Results, Statistical Analysis, a Population Sample subsection, Discussion — which explicitly discusses the population's score range and last correlation when present, Limitations, Conclusion, Reproducibility) populated from your actual study data. Use **Copy** or **Download** to move it into Word/Google Docs/LaTeX.
+3. **Reproducibility tab** — study ID, experiment ID, model version, trials, replication count, random seed, stochastic settings, population sample size/seed, dataset size, and a configuration hash. Use **Export Experiment Configuration** to save a JSON file another researcher (or you, later) can use to reproduce the exact same virtual experiment.
 4. **Final Dashboard tab** — a one-screen status view: indicator scores, experiment result, data quality, and research-design completeness.
 
 ### Turning the draft into an actual paper

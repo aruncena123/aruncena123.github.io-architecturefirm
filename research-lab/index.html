@@ -196,7 +196,7 @@
     <div class="toolbar-group">
       <button class="btn btn-sm" id="btnUndo" title="Undo">↶ Undo</button>
       <button class="btn btn-sm" id="btnRedo" title="Redo">↷ Redo</button>
-      <button class="btn btn-sm" id="btnRandomize">🎲 Randomize</button>
+      <button class="btn btn-sm" id="btnRandomize" title="Reshuffles objects in the space you're currently editing only">🎲 Randomize This Layout</button>
       <button class="btn btn-sm" id="btnClearSpace">Clear</button>
     </div>
   </div>
@@ -271,6 +271,21 @@
         <div id="snapshotList" class="mini-list"></div>
       </div>
     </div>
+  </div>
+
+  <div class="card population-card">
+    <h3>Random Population Generator <span class="badge badge-population" title="A population is a batch of independently randomized layouts used as a broader sample for correlation and exploratory research — different from a single Baseline/Treatment pair or a hand-picked Condition.">ⓘ what is a population?</span></h3>
+    <p class="hint">Generates a set of independently randomized plaza layouts — same geometry, varied object counts &amp; positions — to use as a <strong>sample population</strong> for exploratory and correlational research. Example research use: "Does tree count correlate with the comfort indicator across a population of layouts?" Every generated layout is added to the Dataset (as <code>observation_type = simulation</code>) and can be cited in your Research Report's Discussion.</p>
+    <div class="form-grid">
+      <label class="field"><span>Population size (n)</span><input type="number" id="popCount" min="3" max="50" value="12" /></label>
+      <label class="field"><span>Random seed</span><input type="number" id="popSeed" value="777" /></label>
+    </div>
+    <div class="action-row">
+      <button class="btn btn-primary" id="btnGeneratePopulation">🧪 Generate Random Population</button>
+      <button class="btn btn-danger-outline" id="btnClearPopulation">Clear Population</button>
+    </div>
+    <div id="populationSummary" class="hint small"></div>
+    <div id="populationList" class="mini-list" style="margin-top:8px;"></div>
   </div>
 </section>
 
@@ -588,6 +603,7 @@
   <div class="ana-tab-panel" data-anatabpanel="correlation">
     <div class="card">
       <h3>Correlation Explorer</h3>
+      <p class="hint small">Sample units are drawn from Baseline, Treatment, named Conditions, Snapshots, and any generated <strong>Population</strong> layouts (Space Builder) — the larger and more varied your population, the more meaningful the correlation.</p>
       <div class="form-grid">
         <label class="field"><span>Variable X</span><select id="corrX"></select></label>
         <label class="field"><span>Variable Y</span><select id="corrY"></select></label>
@@ -758,6 +774,27 @@
         <li><strong>Dataset</strong> — review, edit, export CSV/JSON.</li>
         <li><strong>Research Report</strong> — generate a draft summary, paper outline, and reproducibility manifest.</li>
       </ol>
+      <h3 style="margin-top:16px;">Key Concepts (Glossary)</h3>
+      <dl class="glossary">
+        <dt>Model-based indicator</dt>
+        <dd>A computed 0–100 score from a transparent, inspectable formula (see any "View Calculation" button). It estimates modeled potential under stated assumptions — not a measured real-world value.</dd>
+        <dt>Baseline / Treatment</dt>
+        <dd>A controlled-experiment pair. Treatment starts as an exact copy of Baseline; you then change only the independent variable, so any difference in indicators can be attributed to that one change.</dd>
+        <dt>Locked control variables</dt>
+        <dd>Variables you've committed to keep identical between Baseline and Treatment (e.g. geometry, entrances, lighting) so they can't confound the comparison.</dd>
+        <dt>Trial</dt>
+        <dd>One computed run of an indicator for a condition. In deterministic mode, repeated trials of the same condition give identical values — enable "stochastic simulation" (Experiment → Replication) to add synthetic trial-to-trial variation.</dd>
+        <dt>Replication</dt>
+        <dd>How many trials are run per condition in a controlled experiment. More replication gives sturdier descriptive statistics (mean, SD) for each condition.</dd>
+        <dt>Condition</dt>
+        <dd>One named, hand-built space configuration you want to compare against others (Experiment → Multi-Condition, up to 10).</dd>
+        <dt>Population</dt>
+        <dd>A larger batch (e.g. 10–50) of independently randomized layouts (Space Builder → Random Population Generator), used as a broader sample for correlation and exploratory analysis rather than a single hand-picked comparison.</dd>
+        <dt>Effect size (SMD)</dt>
+        <dd>Standardized mean difference between two conditions' trial values. It needs variance to be computable — either stochastic simulation or several distinct trial values.</dd>
+        <dt>Correlation vs. causation</dt>
+        <dd>A Pearson <em>r</em> describes an association within this simulated/model-generated dataset only. It never, by itself, proves that one variable causes another.</dd>
+      </dl>
     </div>
   </div>
 </div>

@@ -227,11 +227,41 @@ const SpaceModel = (() => {
     return { geometry: defaultGeometry(), params: defaultParams(), timeCondition: "Afternoon", objects: emptyObjects() };
   }
 
+  /* Pure, seed-reproducible random layout generator. Inherits geometry/params/time
+     condition from baseSpace but independently randomizes object counts, positions,
+     and (where applicable) types — used to build a POPULATION sample of layouts for
+     exploratory/correlational research, distinct from a single mutated "current space". */
+  function randomSpace(baseSpace, seed) {
+    const rng = Utils.mulberry32((seed >>> 0) || 1);
+    const space = {
+      geometry: Object.assign({}, baseSpace.geometry), params: Object.assign({}, baseSpace.params),
+      timeCondition: baseSpace.timeCondition, objects: emptyObjects()
+    };
+    const ranges = {
+      entrances: [1, 6], pathways: [0, 6], seats: [0, 24], trees: [0, 30],
+      shades: [0, 8], lights: [0, 14], water: [0, 3], edges: [0, 8], nodes: [0, 6], obstacles: [0, 6]
+    };
+    OBJ_CATS.forEach(cat => {
+      const [lo, hi] = ranges[cat];
+      const n = lo + Math.floor(rng() * (hi - lo + 1));
+      for (let i = 0; i < n; i++) {
+        const obj = newObject(cat, { x: rng(), y: rng() });
+        if (cat === "pathways") { obj.x1 = rng(); obj.y1 = rng(); obj.x2 = rng(); obj.y2 = rng(); delete obj.x; delete obj.y; }
+        else if (cat === "seats") obj.type = SEAT_TYPES[Math.floor(rng() * SEAT_TYPES.length)];
+        else if (cat === "edges") obj.type = EDGE_TYPES[Math.floor(rng() * EDGE_TYPES.length)];
+        else if (cat === "nodes") obj.type = NODE_TYPES[Math.floor(rng() * NODE_TYPES.length)];
+        else if (cat === "shades") obj.type = SHADE_TYPES[Math.floor(rng() * SHADE_TYPES.length)];
+        space.objects[cat].push(obj);
+      }
+    });
+    return space;
+  }
+
   return {
     OBJ_CATS, SEAT_TYPES, NODE_TYPES, EDGE_TYPES, SHADE_TYPES,
     emptyObjects, defaultGeometry, defaultParams, defaultsForCat,
     phyllotaxis, perimeterPoint, addObject, setObjectCount, getCount,
-    avgField, distinctCount, circularSpread, avgNearestNeighborFrac, defaultSpace, clamp01
+    avgField, distinctCount, circularSpread, avgNearestNeighborFrac, defaultSpace, randomSpace, clamp01
   };
 })();
 
@@ -758,6 +788,10 @@ function defaultState() {
     observations: [],
     participants: { questions: defaultQuestions(), responses: [], nextIndex: 1 },
     snapshots: [],
+    population: [],
+    populationSeed: null,
+    populationCount: 0,
+    lastCorrelation: null,
     dataset: [],
     log: [],
     workflow: { rq: false, variables: true, baseline: false, treatment: false, locked: false, experimentRun: false, observations: false, analyzed: false, exported: false, report: false },
@@ -961,6 +995,64 @@ const SnapshotManager = (() => {
   function remove(id) { App.state.snapshots = App.state.snapshots.filter(s => s.id !== id); markDirty(); }
   function list() { return App.state.snapshots.slice(); }
   return { save, restore, remove, list };
+})();
+
+/* ===================== POPULATION MANAGER =====================
+   A "population" is a batch of independently randomized layouts, kept
+   separate from a single Baseline/Treatment pair or a hand-picked
+   Condition. It exists to give exploratory/correlational research a
+   meaningful sample size (n=3..50). Each member is added to the shared
+   Dataset (observation_type "simulation") so it counts toward the
+   project's overall population of data, and can be cited from the
+   generated research report. Regenerating REPLACES the previous
+   population (and its dataset rows) rather than appending, so re-running
+   with different settings doesn't silently inflate the dataset. */
+const PopulationManager = (() => {
+  function clearDatasetRows() {
+    App.state.dataset = App.state.dataset.filter(r => r.independent_variable !== "population_member");
+  }
+  function generate(count, seed) {
+    count = Utils.clamp(Math.round(count) || 10, 3, 50);
+    seed = Number(seed) || Math.floor(Date.now() % 100000);
+    clearDatasetRows();
+    App.state.population = [];
+    for (let i = 0; i < count; i++) {
+      const memberSeed = seed + i * 104729; // large prime offset decorrelates each member's RNG stream
+      const space = SpaceModel.randomSpace(App.state.space, memberSeed);
+      const result = CalcEngine.computeIndicators(space, App.state.weights);
+      App.state.population.push({ id: Utils.uid("pop"), index: i + 1, seed: memberSeed, space, timestamp: Utils.nowISO() });
+      DatasetManager.addRow({
+        condition: "Population #" + (i + 1), independent_variable: "population_member", independent_value: i + 1,
+        dependent_variable: "Public Space Quality Score", dependent_value: Utils.round1(result.composite.score),
+        observation_type: "simulation", notes: "Randomly generated population layout (seed " + memberSeed + ")"
+      });
+    }
+    App.state.populationSeed = seed;
+    App.state.populationCount = count;
+    LogManager.add("Random population generated", "population", "", count + " layouts (seed " + seed + ")");
+    markDirty();
+    return App.state.population;
+  }
+  function clear() {
+    clearDatasetRows();
+    App.state.population = [];
+    LogManager.add("Population cleared", "population", "", "");
+    markDirty();
+  }
+  function list() { return App.state.population.slice(); }
+  function qualityValues() { return App.state.population.map(m => CalcEngine.computeIndicators(m.space, App.state.weights).composite.score); }
+  function stats() { return StatsEngine.describe(qualityValues()); }
+  function preview(id) {
+    const m = App.state.population.find(x => x.id === id);
+    if (!m) return false;
+    SpaceHistory.beginEdit();
+    App.state.space = Utils.deepClone(m.space);
+    SpaceHistory.commitEdit();
+    LogManager.add("Population layout previewed in Space Builder", "space", "", m.id);
+    markDirty();
+    return true;
+  }
+  return { generate, clear, list, qualityValues, stats, preview };
 })();
 
 /* ===================== EXPERIMENT ENGINE ===================== */
@@ -1795,6 +1887,23 @@ const QualityCheck = (() => {
 const ReportGenerator = (() => {
   function cautious(text) { return text; }
 
+  function populationLines() {
+    const pop = App.state.population;
+    if (!pop.length) return [];
+    const stats = PopulationManager.stats();
+    const lines = [];
+    lines.push("POPULATION SAMPLE (SUPPLEMENTARY)");
+    lines.push("A supplementary population of n=" + pop.length + " independently randomized layouts was generated (random seed " + App.state.populationSeed + ") to broaden the sample available for exploratory and correlational analysis beyond the single Baseline/Treatment pair. Each layout is included in the exported dataset as a distinct simulation row.");
+    lines.push("Public Space Quality Score across the population: mean=" + stats.mean + ", sd=" + stats.sd + ", min=" + stats.min + ", max=" + stats.max + ", n=" + stats.n + ".");
+    if (App.state.lastCorrelation) {
+      const c = App.state.lastCorrelation;
+      lines.push("Most recently explored correlation: " + c.xLabel + " vs. " + c.yLabel + " — Pearson r = " + (c.r === null ? "n/a" : c.r) + " (n=" + c.n + ", drawn from Baseline/Treatment/Conditions/Snapshots/Population).");
+      lines.push(cautious("This association is observed only within the simulated/model-generated sample and does not by itself establish real-world causation. It is offered as a preliminary, model-internal pattern for discussion, not a validated finding."));
+    }
+    lines.push("");
+    return lines;
+  }
+
   function buildSummary() {
     const s = App.state.study;
     const exp = ExperimentEngine.getActive();
@@ -1861,6 +1970,7 @@ const ReportGenerator = (() => {
     const desc = StatsEngine.describe(allVals);
     lines.push("n=" + desc.n + ", mean=" + desc.mean + ", median=" + desc.median + ", sd=" + desc.sd + ", min=" + desc.min + ", max=" + desc.max + ", range=" + desc.range);
     lines.push("");
+    populationLines().forEach(l => lines.push(l));
     lines.push("LIMITATIONS");
     MODEL_LIMITATIONS.forEach(l => lines.push("- " + l));
     lines.push("");
@@ -1871,6 +1981,7 @@ const ReportGenerator = (() => {
     lines.push("- How do the component variables driving the observed difference relate to established literature?");
     lines.push("- What empirical data-collection methods (observation, survey, sensor) could validate these model-based indicators?");
     lines.push("- Which model assumptions or weights most influenced the result, and how sensitive is the conclusion to them?");
+    if (App.state.population.length) lines.push("- How representative is the generated random population (n=" + App.state.population.length + ") of plausible real-world configurations, and would a larger or differently-constrained population change the pattern observed?");
     lines.push("");
     lines.push("DATA AVAILABILITY STATEMENT");
     lines.push("The full dataset (" + App.state.dataset.length + " rows) generated by this instrument can be exported as CSV/JSON from the Dataset module.");
@@ -1926,8 +2037,17 @@ const ReportGenerator = (() => {
     L.push("Across all simulation dataset rows: n=" + desc.n + ", mean=" + desc.mean + ", median=" + desc.median + ", SD=" + desc.sd + ", range=" + desc.range + ".");
     L.push("Effect sizes reported (mean difference, percentage difference, standardized mean difference) are calculated from the collected/model data and should not be interpreted as externally validated evidence without empirical validation.");
     L.push("");
+    populationLines().forEach(l => L.push(l));
     L.push("9. DISCUSSION");
     L.push(cautious("Within the assumptions of this computational model, the observed pattern is consistent with the stated hypothesis to the extent described above. This association should not be read as a causal or generalizable claim about real-world human behavior without independent empirical validation (field observation, participant studies, or sensor data)."));
+    if (App.state.population.length) {
+      const popStats = PopulationManager.stats();
+      L.push(cautious("As supplementary context, a randomly generated population of n=" + App.state.population.length + " layouts produced a Public Space Quality Score ranging from " + popStats.min + " to " + popStats.max + " (mean=" + popStats.mean + ", SD=" + popStats.sd + "), illustrating the range of model outcomes achievable through spatial variation alone under the current weighting scheme. This population-level variation should be discussed as model behavior, not as evidence about the distribution of real public spaces."));
+    }
+    if (App.state.lastCorrelation && App.state.lastCorrelation.r !== null) {
+      const c = App.state.lastCorrelation;
+      L.push(cautious("An exploratory correlation between " + c.xLabel + " and " + c.yLabel + " across the available sample (n=" + c.n + ") returned r=" + c.r + ". This is reported as a preliminary, model-internal association worth further discussion and empirical follow-up, not as confirmatory evidence."));
+    }
     L.push("");
     L.push("10. LIMITATIONS");
     MODEL_LIMITATIONS.forEach(l => L.push("- " + l));
@@ -1961,12 +2081,14 @@ const ReportGenerator = (() => {
       seed: exp ? exp.seed : null,
       stochastic: App.state.settings.stochasticEnabled,
       stochasticLevel: App.state.settings.stochasticLevel,
+      populationSize: App.state.population.length,
+      populationSeed: App.state.populationSeed,
       datasetSize: App.state.dataset.length,
       configHash: Utils.hashString(configString)
     };
   }
 
-  return { buildSummary, buildPaper, reproManifest };
+  return { buildSummary, buildPaper, reproManifest, populationLines };
 })();
 
 const MODEL_LIMITATIONS = [
@@ -2259,6 +2381,24 @@ function initSpaceBuilderUI() {
     Utils.toast("Snapshot saved.", "success");
   });
 
+  document.getElementById("btnGeneratePopulation").addEventListener("click", () => {
+    const count = Number(document.getElementById("popCount").value) || 12;
+    const seed = Number(document.getElementById("popSeed").value) || 777;
+    PopulationManager.generate(count, seed);
+    renderPopulationList();
+    UI.updateMiniDashboard();
+    if (document.getElementById("panel-analysis").classList.contains("active")) populateAnalysisSelectors();
+    Utils.toast("Generated a population of " + App.state.population.length + " random layouts (seed " + seed + "). Added to the dataset.", "success");
+  });
+  document.getElementById("btnClearPopulation").addEventListener("click", () => {
+    if (!App.state.population.length) return;
+    if (!confirm("Clear the entire generated population (" + App.state.population.length + " layouts) and its dataset rows?")) return;
+    PopulationManager.clear();
+    renderPopulationList();
+    UI.updateMiniDashboard();
+    Utils.toast("Population cleared.", "success");
+  });
+
   Viz.init();
 }
 
@@ -2274,6 +2414,29 @@ function renderSnapshotList() {
     if (SnapshotManager.restore(b.dataset.restore)) { fillSpaceForm(); App.onSpaceChanged(); Utils.toast("Snapshot restored.", "success"); }
   }));
   list.querySelectorAll("[data-remove-snap]").forEach(b => b.addEventListener("click", () => { SnapshotManager.remove(b.dataset.removeSnap); renderSnapshotList(); }));
+}
+
+function renderPopulationList() {
+  const summaryEl = document.getElementById("populationSummary");
+  const listEl = document.getElementById("populationList");
+  const members = PopulationManager.list();
+  if (!members.length) {
+    summaryEl.innerHTML = "";
+    listEl.innerHTML = '<p class="hint small">No population generated yet.</p>';
+    return;
+  }
+  const stats = PopulationManager.stats();
+  summaryEl.innerHTML = 'Population n = <strong>' + members.length + '</strong> (seed ' + App.state.populationSeed + ') — ' +
+    'Public Space Quality Score across population: mean ' + stats.mean + ', SD ' + stats.sd + ', range ' + stats.min + '–' + stats.max + '. ' +
+    '<span class="hint small">Available as sample units in Analysis → Correlation Explorer &amp; Scenario Comparison, and summarized in the Research Report.</span>';
+  listEl.innerHTML = members.map(m => {
+    const r = CalcEngine.computeIndicators(m.space, App.state.weights);
+    return '<div class="mini-list-item"><span>Population #' + m.index + ' <span class="hint small">(seed ' + m.seed + ', Quality ' + Utils.round1(r.composite.score) + ')</span></span>' +
+      '<span class="mli-actions"><button class="btn btn-xs" data-preview-pop="' + m.id + '">Preview</button></span></div>';
+  }).join("");
+  listEl.querySelectorAll("[data-preview-pop]").forEach(b => b.addEventListener("click", () => {
+    if (PopulationManager.preview(b.dataset.previewPop)) { fillSpaceForm(); App.onSpaceChanged(); Utils.toast("Previewing population layout in Space Builder (this replaces the current space — Undo to go back).", "success"); }
+  }));
 }
 
 /* --- Properties panel for selected canvas object --- */
@@ -2692,6 +2855,7 @@ function getSampleUnits() {
   if (App.state.conditions.treatment) units.push({ label: "Treatment", space: App.state.conditions.treatment.space });
   App.state.conditions.list.forEach(c => units.push({ label: c.name, space: c.space }));
   App.state.snapshots.forEach(s => units.push({ label: s.name, space: s.space }));
+  App.state.population.forEach(p => units.push({ label: "Population #" + p.index, space: p.space, isPopulation: true }));
   if (!units.length) units.push({ label: "Current Space", space: App.state.space });
   return units;
 }
@@ -2795,12 +2959,16 @@ function runCorrelation() {
   const r = StatsEngine.pearson(xs, ys);
   const el = document.getElementById("corrResult");
   if (points.length < 3) {
-    el.innerHTML = '<p class="hint">Only ' + points.length + ' sample unit(s) available (baseline/treatment/conditions/snapshots). Add more conditions or snapshots for a meaningful correlation (n ≥ 3 recommended).</p>';
+    el.innerHTML = '<p class="hint">Only ' + points.length + ' sample unit(s) available (Baseline/Treatment/Conditions/Snapshots/Population). Generate a Random Population in Space Builder for a meaningful correlation (n ≥ 3 recommended, ideally 10+).</p>';
+    App.state.lastCorrelation = null;
   } else {
     el.innerHTML = '<div class="stats-grid"><div class="stat-box"><div class="stat-val">' + (r === null ? "n/a" : Utils.round1(r)) + '</div><div class="stat-lab">Pearson r</div></div>' +
       '<div class="stat-box"><div class="stat-val">' + points.length + '</div><div class="stat-lab">Sample size (n)</div></div></div>' +
       '<div class="causality-warning" style="margin-top:10px;">CAUTION: Correlation in this simulated/model-generated data does not establish real-world causation.</div>';
+    App.state.lastCorrelation = { xLabel: xDef.label, yLabel: yDef.label, r: r === null ? null : Utils.round1(r), n: points.length, timestamp: Utils.nowISO() };
   }
+  App.state.workflow.analyzed = true;
+  markDirty();
   Charts.scatterChart(document.getElementById("scatterChart"), points, { xLabel: xDef.label, yLabel: yDef.label });
 }
 
@@ -2928,6 +3096,7 @@ function renderReproPanel() {
     '<tr><td>Replication Count</td><td>' + (rp.replication ?? "n/a") + '</td></tr>' +
     '<tr><td>Randomization Seed</td><td>' + (rp.seed ?? "n/a") + '</td></tr>' +
     '<tr><td>Stochastic Simulation</td><td>' + (rp.stochastic ? "Enabled (" + rp.stochasticLevel + "%)" : "Disabled") + '</td></tr>' +
+    '<tr><td>Population Sample Size</td><td>' + rp.populationSize + (rp.populationSize ? " layouts (seed " + rp.populationSeed + ")" : " (none generated)") + '</td></tr>' +
     '<tr><td>Dataset Size</td><td>' + rp.datasetSize + ' rows</td></tr>' +
     '<tr><td>Configuration Hash</td><td><code>' + rp.configHash + '</code></td></tr>' +
     '</tbody></table>' +
@@ -2947,7 +3116,7 @@ function renderFinalDashboard() {
     '<h3 style="margin-top:14px;">Experiment Result</h3>' +
     (exp && exp.results ? ('<p>Baseline: ' + exp.results.baseline.stats.mean + ' | Treatment: ' + exp.results.treatment.stats.mean + ' | Difference: ' + exp.results.meanDifference + ' | Effect (SMD): ' + (exp.results.smd === null ? "n/a" : exp.results.smd) + '</p>') : '<p class="hint">No controlled experiment run yet.</p>') +
     '<h3 style="margin-top:14px;">Data Quality</h3>' +
-    '<p>Observations: ' + App.state.observations.length + ' | Participant responses: ' + App.state.participants.responses.length + ' | Trials logged: ' + App.state.dataset.filter(r => r.observation_type === "simulation").length + ' | Replication: ' + (exp ? exp.replication : "n/a") + '</p>' +
+    '<p>Observations: ' + App.state.observations.length + ' | Participant responses: ' + App.state.participants.responses.length + ' | Trials logged: ' + App.state.dataset.filter(r => r.observation_type === "simulation").length + ' | Replication: ' + (exp ? exp.replication : "n/a") + ' | Population sample: ' + App.state.population.length + '</p>' +
     '<h3 style="margin-top:14px;">Research Readiness</h3>' +
     '<p>Research design completeness: <strong>' + qc + '%</strong> | Dataset: ' + (App.state.dataset.length > 0 ? "✓" : "✗") + ' | Analysis: ' + (App.state.workflow.analyzed ? "✓" : "✗") + ' | Reproducibility manifest: ✓ | Limitations acknowledged: ✓</p>';
 }
@@ -3082,7 +3251,7 @@ function loadFullDemo() {
 /* ===================== FULL RE-RENDER (after state replace) ===================== */
 function fullRerender() {
   fillStudyForm(); UI.renderQualityCheck();
-  fillSpaceForm(); Viz.render(); renderPropertiesPanel(); renderSnapshotList();
+  fillSpaceForm(); Viz.render(); renderPropertiesPanel(); renderSnapshotList(); renderPopulationList();
   UI.renderVariablesPanel();
   fillExperimentForm(ExperimentEngine.getActive());
   renderExperimentList(); renderConditionSummaries(); renderConditionList();
@@ -3118,7 +3287,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initReportUI();
 
   fillStudyForm(); UI.renderQualityCheck();
-  fillSpaceForm(); Viz.render(); renderSnapshotList();
+  fillSpaceForm(); Viz.render(); renderSnapshotList(); renderPopulationList();
   UI.renderVariablesPanel();
   UI.updateMiniDashboard();
 
