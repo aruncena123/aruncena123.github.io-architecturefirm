@@ -10,18 +10,31 @@ A virtual experimental research instrument for architecture, urban design, envir
 
 1. Keep `index.html`, `style.css`, and `script.js` in the same folder (they reference each other by relative path).
 2. Double-click `index.html`, or drag it into a browser tab. That's it — no install, no internet connection required after the page loads.
-3. The app auto-loads a **demo study** the first time it runs (seating configuration vs. social interaction potential), so you can explore a fully populated example immediately. Everything you do is saved automatically to your browser's local storage, so closing and reopening the tab picks up where you left off.
-4. To start your own study from a clean slate: **Dataset → Project Management → Reset Project** (this asks for confirmation first).
+3. The app auto-loads a **demo study** the first time it runs (seating configuration vs. social interaction potential), so you can explore a fully populated example immediately. Everything you do is saved automatically to your browser's local storage, so closing and reopening the tab picks up where you left off — you'll land back on the **Overview** screen each time, which shows your current progress.
+4. To start your own study from a clean slate: click **+ Start My Own Study** on the Overview screen (or **Dataset → Project Management → Reset Project** for a full wipe). Both ask for confirmation first.
 
 The app works fully offline and stores data only in your browser (`localStorage`). Nothing is sent anywhere. To move a study between computers or share it with a collaborator, use **Export All Project Data** / **Import Project Data** (see §6).
 
-**New to the terminology?** Click **? Guide** in the top-right corner at any time — it includes a plain-language glossary (Baseline/Treatment, Trial vs. Replication vs. Population, Condition, Effect Size, Correlation vs. causation, etc.) alongside the step-by-step walkthrough.
+**New to the terminology?** Click **? Guide** in the top-right corner (or **? How does this work?** on the Overview screen) at any time — it includes a plain-language glossary (Baseline/Treatment, Trial vs. Replication vs. Population, Condition, Effect Size, Correlation vs. causation, etc.) alongside the step-by-step walkthrough.
 
 ---
 
-## 2. The 10-step workflow
+## 2. Finding your way around: Overview + 4 stages
 
-The workflow bar at the top of the app tracks these steps in order. You can jump between tabs freely, but this is the intended path from question to finished output:
+The sidebar has just five buttons, because the app is organized into four research **stages**, plus a home screen:
+
+- **Overview** — a status dashboard: which stages you've completed, your current study at a glance, and one-click access to any stage. This is where the app opens every time.
+- **1 · Define** — write your research question, hypothesis, and variables.
+- **2 · Build** — two sub-tabs: **Space Builder** (construct the plaza) and **Indicators & Scores** (the model-based indicator formulas, computed live from what you built).
+- **3 · Experiment** — two sub-tabs: **Run Experiment** (baseline/treatment, parametric, sensitivity, multi-condition, replication) and **Observations & Responses** (field notes and Likert surveys).
+- **4 · Results** — three sub-tabs: **Analysis** (charts/correlation), **Dataset** (the reproducible data table and exports), and **Research Report** (summary/paper/reproducibility drafts).
+
+When a stage has more than one sub-tab, a small pill row appears above the content to switch between them. Two things make it hard to get lost:
+
+- **The workflow bar** at the very top (10 numbered steps) is clickable — click any step (e.g. "Run Experiment") and it jumps you straight to the right stage and sub-tab, no need to know where it lives.
+- **A "Next: ... →" button** sits at the bottom of every panel. If you just keep clicking it, it walks you through the whole process in order — Research Question → Space Builder → Indicators → Experiment → Observations → Analysis → Dataset → Report → back to Overview — without you needing to think about the stage structure at all.
+
+The full linear order those two features follow:
 
 1. **Research Question** — define your study
 2. **Variables** — review the model-based indicators and their formulas
@@ -33,6 +46,8 @@ The workflow bar at the top of the app tracks these steps in order. You can jump
 8. **Analyze** — charts, correlation, comparison matrix, effect sizes
 9. **Export Dataset** — CSV/JSON suitable for Excel, SPSS, R, Python, JASP, Jamovi
 10. **Research Draft** — generate a structured summary and paper outline
+
+Some fine-print/advanced sections are collapsed by default to keep each screen readable — e.g. Space Builder's **Abstract Parameters** and **Random Population Generator** — click their heading to expand.
 
 ---
 

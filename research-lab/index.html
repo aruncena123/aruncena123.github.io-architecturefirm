@@ -41,29 +41,20 @@
 
 <div class="app-shell">
 <nav class="sidebar" id="sidebar" aria-label="Main navigation">
-  <button class="nav-item active" data-tab="research-question" aria-current="page">
-    <span class="nav-icon">1</span><span>Research Question</span>
+  <button class="nav-item stage-nav-item active" data-stage="overview" aria-current="page">
+    <span class="nav-icon">★</span><span class="nav-item-text"><span class="nav-item-title">Overview</span><span class="nav-item-sub">Start here</span></span>
   </button>
-  <button class="nav-item" data-tab="space-builder">
-    <span class="nav-icon">2</span><span>Space Builder</span>
+  <button class="nav-item stage-nav-item" data-stage="define">
+    <span class="nav-icon">1</span><span class="nav-item-text"><span class="nav-item-title">Define</span><span class="nav-item-sub">Your research question</span></span>
   </button>
-  <button class="nav-item" data-tab="variables">
-    <span class="nav-icon">3</span><span>Variables</span>
+  <button class="nav-item stage-nav-item" data-stage="build">
+    <span class="nav-icon">2</span><span class="nav-item-text"><span class="nav-item-title">Build</span><span class="nav-item-sub">Space &amp; indicators</span></span>
   </button>
-  <button class="nav-item" data-tab="experiment">
-    <span class="nav-icon">4</span><span>Experiment</span>
+  <button class="nav-item stage-nav-item" data-stage="experiment">
+    <span class="nav-icon">3</span><span class="nav-item-text"><span class="nav-item-title">Experiment</span><span class="nav-item-sub">Run &amp; observe</span></span>
   </button>
-  <button class="nav-item" data-tab="observations">
-    <span class="nav-icon">5</span><span>Observations</span>
-  </button>
-  <button class="nav-item" data-tab="analysis">
-    <span class="nav-icon">6</span><span>Analysis</span>
-  </button>
-  <button class="nav-item" data-tab="dataset">
-    <span class="nav-icon">7</span><span>Dataset</span>
-  </button>
-  <button class="nav-item" data-tab="report">
-    <span class="nav-icon">8</span><span>Research Report</span>
+  <button class="nav-item stage-nav-item" data-stage="results">
+    <span class="nav-icon">4</span><span class="nav-item-text"><span class="nav-item-title">Results</span><span class="nav-item-sub">Analyze, export, report</span></span>
   </button>
 
   <div class="sidebar-footer">
@@ -78,8 +69,41 @@
 
 <main id="main-content" class="content">
 
+<div class="stage-subnav" id="stageSubnav" hidden></div>
+
+<!-- ================= OVERVIEW ================= -->
+<section class="panel active" id="panel-overview" aria-labelledby="ov-heading">
+  <div class="panel-header">
+    <h2 id="ov-heading">Welcome to the Public Space Research Laboratory</h2>
+    <p class="panel-desc">A guided, four-stage workflow for exploring public-space design questions with a virtual experimental instrument. Pick up where you left off below, or start fresh.</p>
+  </div>
+
+  <div class="card overview-hero">
+    <h3>Quick Start</h3>
+    <p class="hint">New here? Load the built-in example to see a complete study end-to-end — research question, experiment, dataset, and report all filled in. Or jump straight into Stage 1 to start your own study.</p>
+    <div class="action-row">
+      <button class="btn btn-primary" id="ovBtnLoadDemo">▶ See a Complete Example</button>
+      <button class="btn" id="ovBtnStartNew">+ Start My Own Study</button>
+      <button class="btn btn-ghost" id="ovBtnGuide">? How does this work?</button>
+    </div>
+  </div>
+
+  <div class="stage-grid" id="overviewStageGrid" aria-label="Workflow stages"></div>
+
+  <div class="card">
+    <h3>Current Study</h3>
+    <div id="overviewStudySummary" class="hint"></div>
+  </div>
+
+  <div class="card overview-positioning">
+    <h3>What this instrument is — and isn't</h3>
+    <p class="hint">This laboratory is a <strong>virtual experimental research instrument</strong>: it lets you build public-space configurations, compute transparent model-based indicators, run controlled and exploratory experiments, and generate a reproducible dataset and draft report.</p>
+    <p class="hint">It is <strong>not</strong> a validated measurement of real human behavior, a proven predictor, or a substitute for field research. Every score you see is a computational estimate — see <a href="#panel-report" id="ovLimitationsLink">Model Limitations</a> for the full statement.</p>
+  </div>
+</section>
+
 <!-- ================= RESEARCH QUESTION ================= -->
-<section class="panel active" id="panel-research-question" aria-labelledby="rq-heading">
+<section class="panel" id="panel-research-question" aria-labelledby="rq-heading">
   <div class="panel-header">
     <h2 id="rq-heading">1. Research Question</h2>
     <p class="panel-desc">Define the scope of your inquiry before manipulating the virtual space. This information frames every subsequent module.</p>
@@ -153,6 +177,9 @@
       <p class="hint small">Note: this measures design <em>completeness</em>, not scientific validity.</p>
     </div>
   </div>
+  <div class="next-step-row" data-next-from="research-question">
+    <button class="btn btn-primary btn-next-step">Next: Build Your Space →</button>
+  </div>
 </section>
 
 <!-- ================= SPACE BUILDER ================= -->
@@ -210,8 +237,8 @@
         <label class="field-inline"><span>Boundary Openness</span><input type="range" id="geoOpenness" min="0" max="100" value="60"/><output>60</output></label>
         <label class="field-inline"><span>Enclosure Level</span><input type="range" id="geoEnclosure" min="0" max="100" value="40"/><output>40</output></label>
       </div>
-      <div class="card">
-        <h3>Abstract Parameters</h3>
+      <details class="card">
+        <summary>Abstract Parameters <span class="hint small">(advanced — click to expand)</span></summary>
         <p class="hint small">Continuous design parameters not represented as discrete objects.</p>
         <label class="field-inline"><span>Path Directness</span><input type="range" id="parPathDirectness" min="0" max="100" value="70"/><output>70</output></label>
         <label class="field-inline"><span>Path Connectivity</span><input type="range" id="parPathConnectivity" min="0" max="100" value="60"/><output>60</output></label>
@@ -223,9 +250,9 @@
         <label class="field-inline"><span>Crowding (assumption)</span><input type="range" id="parCrowding" min="0" max="100" value="25"/><output>25</output></label>
         <label class="field-inline"><span>Hardscape Ratio</span><input type="range" id="parHardscape" min="0" max="100" value="55"/><output>55</output></label>
         <label class="field-inline"><span>Lighting Brightness</span><input type="range" id="parBrightness" min="0" max="100" value="60"/><output>60</output></label>
-      </div>
-      <div class="card">
-        <h3>Time Condition (Scenario Assumption)</h3>
+      </details>
+      <details class="card">
+        <summary>Time Condition <span class="hint small">(scenario assumption)</span></summary>
         <div class="chip-group" id="timeConditionGroup">
           <button class="chip" data-value="Morning">Morning</button>
           <button class="chip active" data-value="Afternoon">Afternoon</button>
@@ -233,7 +260,7 @@
           <button class="chip" data-value="Night">Night</button>
         </div>
         <p class="hint small">Adjusts lighting / activity / shade weighting assumptions. Labeled as scenario assumption, not sensor data.</p>
-      </div>
+      </details>
     </div>
 
     <div class="builder-canvas-wrap">
@@ -273,8 +300,8 @@
     </div>
   </div>
 
-  <div class="card population-card">
-    <h3>Random Population Generator <span class="badge badge-population" title="A population is a batch of independently randomized layouts used as a broader sample for correlation and exploratory research — different from a single Baseline/Treatment pair or a hand-picked Condition.">ⓘ what is a population?</span></h3>
+  <details class="card population-card">
+    <summary>Random Population Generator <span class="hint small">(advanced — for broader sampling)</span> <span class="badge badge-population" title="A population is a batch of independently randomized layouts used as a broader sample for correlation and exploratory research — different from a single Baseline/Treatment pair or a hand-picked Condition.">ⓘ what is a population?</span></summary>
     <p class="hint">Generates a set of independently randomized plaza layouts — same geometry, varied object counts &amp; positions — to use as a <strong>sample population</strong> for exploratory and correlational research. Example research use: "Does tree count correlate with the comfort indicator across a population of layouts?" Every generated layout is added to the Dataset (as <code>observation_type = simulation</code>) and can be cited in your Research Report's Discussion.</p>
     <div class="form-grid">
       <label class="field"><span>Population size (n)</span><input type="number" id="popCount" min="3" max="50" value="12" /></label>
@@ -286,6 +313,10 @@
     </div>
     <div id="populationSummary" class="hint small"></div>
     <div id="populationList" class="mini-list" style="margin-top:8px;"></div>
+  </details>
+
+  <div class="next-step-row" data-next-from="space-builder">
+    <button class="btn btn-primary btn-next-step">Next: Review Indicators &amp; Scores →</button>
   </div>
 </section>
 
@@ -312,6 +343,10 @@
   </div>
 
   <div id="indicatorCategories" class="indicator-categories"></div>
+
+  <div class="next-step-row" data-next-from="variables">
+    <button class="btn btn-primary btn-next-step">Next: Set Up Your Experiment →</button>
+  </div>
 </section>
 
 <!-- ================= EXPERIMENT ================= -->
@@ -469,6 +504,10 @@
       <div id="replicationTable"></div>
     </div>
   </div>
+
+  <div class="next-step-row" data-next-from="experiment">
+    <button class="btn btn-primary btn-next-step">Next: Log Observations (optional) →</button>
+  </div>
 </section>
 
 <!-- ================= OBSERVATIONS ================= -->
@@ -540,6 +579,10 @@
       <h3>Response Summary</h3>
       <div id="responseSummary"></div>
     </div>
+  </div>
+
+  <div class="next-step-row" data-next-from="observations">
+    <button class="btn btn-primary btn-next-step">Next: Analyze Results →</button>
   </div>
 </section>
 
@@ -621,6 +664,10 @@
       <div id="comparisonMatrixTable"></div>
     </div>
   </div>
+
+  <div class="next-step-row" data-next-from="analysis">
+    <button class="btn btn-primary btn-next-step">Next: Export Your Dataset →</button>
+  </div>
 </section>
 
 <!-- ================= DATASET ================= -->
@@ -670,6 +717,10 @@
       <input type="file" id="importFileInput" accept="application/json" hidden />
       <button class="btn btn-danger-outline" id="btnResetProject">Reset Project</button>
     </div>
+  </div>
+
+  <div class="next-step-row" data-next-from="dataset">
+    <button class="btn btn-primary btn-next-step">Next: Generate Research Report →</button>
   </div>
 </section>
 
@@ -734,6 +785,10 @@
       <li>Correlation does not establish causation.</li>
       <li>Composite scores should be interpreted in relation to their component variables.</li>
     </ul>
+  </div>
+
+  <div class="next-step-row" data-next-from="report">
+    <button class="btn btn-primary btn-next-step">✓ Back to Overview</button>
   </div>
 </section>
 

@@ -2104,17 +2104,69 @@ const MODEL_LIMITATIONS = [
 /* ===================== UI: CORE (tabs, status, modals, workflow) ===================== */
 const UI = {};
 
+/* Groups the 9 panels into 4 guided research stages (plus Overview) so the
+   sidebar only ever presents 5 choices. A stage with >1 panel gets a small
+   pill sub-navigation rendered above the content by renderStageSubnav(). */
+const STAGES = [
+  { key: "overview", label: "Overview", panels: ["overview"] },
+  { key: "define", label: "1 · Define", panels: ["research-question"] },
+  { key: "build", label: "2 · Build", panels: ["space-builder", "variables"] },
+  { key: "experiment", label: "3 · Experiment", panels: ["experiment", "observations"] },
+  { key: "results", label: "4 · Results", panels: ["analysis", "dataset", "report"] }
+];
+const STAGE_PANEL_LABELS = {
+  "research-question": "Research Question", "space-builder": "Space Builder", "variables": "Indicators & Scores",
+  "experiment": "Run Experiment", "observations": "Observations & Responses",
+  "analysis": "Analysis", "dataset": "Dataset", "report": "Research Report"
+};
+/* Linear "Next step" order used by the bottom-of-panel Next buttons. */
+const PANEL_ORDER = ["research-question", "space-builder", "variables", "experiment", "observations", "analysis", "dataset", "report"];
+/* Where each numbered workflow-bar step should jump to: [panelKey, subTabAttr?, subTabKey?] */
+const WORKFLOW_STEP_TARGETS = {
+  1: ["research-question"], 2: ["variables"], 3: ["space-builder"],
+  4: ["experiment", "exptab", "controlled"], 5: ["experiment", "exptab", "controlled"], 6: ["experiment", "exptab", "controlled"],
+  7: ["observations", "obstab", "observation"], 8: ["analysis", "anatab", "descriptive"],
+  9: ["dataset"], 10: ["report", "reptab", "summary"]
+};
+function stageForPanel(tabKey) { return STAGES.find(s => s.panels.includes(tabKey)) || null; }
+
+function renderStageSubnav(stage, activeKey) {
+  const container = document.getElementById("stageSubnav");
+  if (!container) return;
+  if (!stage || stage.panels.length < 2) { container.hidden = true; container.innerHTML = ""; return; }
+  container.hidden = false;
+  container.innerHTML = '<span class="stage-subnav-label">' + stage.label.replace(/^\d+\s*·\s*/, "") + ":</span>" +
+    stage.panels.map(p => '<button class="chip stage-pill' + (p === activeKey ? " active" : "") + '" data-tab="' + p + '">' + STAGE_PANEL_LABELS[p] + "</button>").join("");
+  container.querySelectorAll("[data-tab]").forEach(b => b.addEventListener("click", () => UI.switchTab(b.dataset.tab)));
+}
+
 UI.switchTab = function (tabKey) {
-  document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.tab === tabKey));
   document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + tabKey));
   const sidebar = document.getElementById("sidebar");
   if (sidebar && sidebar.classList.contains("open")) sidebar.classList.remove("open");
+  if (tabKey === "overview") UI.renderOverview();
   if (tabKey === "space-builder") Viz.render();
   if (tabKey === "variables") UI.renderVariablesPanel();
   if (tabKey === "dataset") UI.renderDatasetPanel();
   if (tabKey === "analysis") UI.renderAnalysisPanel();
   if (tabKey === "report") UI.renderReportStatics();
+  const stage = stageForPanel(tabKey);
+  if (stage) {
+    document.querySelectorAll(".stage-nav-item").forEach(b => b.classList.toggle("active", b.dataset.stage === stage.key));
+    renderStageSubnav(stage, tabKey);
+  }
   window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+};
+
+/* Jump to a panel and, if given, click into one of its internal sub-tabs
+   (reuses the existing delegated tab-strip listener rather than duplicating
+   its switching logic). Used by the clickable workflow bar. */
+UI.gotoPanel = function (tabKey, subAttr, subKey) {
+  UI.switchTab(tabKey);
+  if (subAttr && subKey) {
+    const btn = document.querySelector("[data-" + subAttr + '="' + subKey + '"]');
+    if (btn) btn.click();
+  }
 };
 
 UI.switchSubTab = function (groupSelector, btnAttr, panelSelector, panelAttr, key) {
@@ -2182,11 +2234,68 @@ UI.showCalcModal = function (indicatorId) {
   UI.openModal("calcModalOverlay");
 };
 
+UI.renderOverview = function () {
+  const w = App.state.workflow;
+  const exp = ExperimentEngine.getActive();
+  const stageStatus = [
+    { title: "1 · Define Your Study", desc: "Write your research question, hypothesis, and independent/dependent variables.", done: !!App.state.study.question.trim(), panel: "research-question" },
+    { title: "2 · Build & Score a Space", desc: "Construct a plaza layout (or load a preset) and review its model-based indicators.", done: !!App.state.conditions.baseline, panel: "space-builder" },
+    { title: "3 · Run an Experiment", desc: "Compare a Baseline vs Treatment, run a parametric/sensitivity study, and log observations or survey responses.", done: w.experimentRun, panel: "experiment" },
+    { title: "4 · Analyze & Report", desc: "Explore charts and correlations, export your dataset, and generate a research draft.", done: w.report, panel: "analysis" }
+  ];
+  const grid = document.getElementById("overviewStageGrid");
+  grid.innerHTML = stageStatus.map(s => (
+    '<div class="stage-card"><div class="stage-card-top"><span class="stage-badge' + (s.done ? " done" : "") + '">' + (s.done ? "✓ Done" : "Not started") + "</span></div>" +
+    "<h4>" + s.title + '</h4><p class="hint small">' + s.desc + "</p>" +
+    '<button class="btn btn-sm" data-goto-panel="' + s.panel + '">Go →</button></div>'
+  )).join("");
+  grid.querySelectorAll("[data-goto-panel]").forEach(b => b.addEventListener("click", () => UI.switchTab(b.dataset.gotoPanel)));
+
+  const summaryEl = document.getElementById("overviewStudySummary");
+  summaryEl.innerHTML = App.state.study.title || App.state.study.question
+    ? ("<strong>" + (App.state.study.title || "(untitled study)") + "</strong><br/>" + (App.state.study.question || "") +
+       '<br/><span class="hint small">Dataset rows: ' + App.state.dataset.length + " · Experiment: " + (exp ? exp.id : "none") + " · Population sample: " + App.state.population.length + "</span>")
+    : '<span class="hint">No study defined yet — head to Stage 1 to get started, or load the demo above.</span>';
+};
+
 function initCoreUI() {
-  document.querySelectorAll(".nav-item").forEach(btn => btn.addEventListener("click", () => UI.switchTab(btn.dataset.tab)));
+  document.querySelectorAll(".stage-nav-item").forEach(btn => btn.addEventListener("click", () => {
+    const stage = STAGES.find(s => s.key === btn.dataset.stage);
+    if (stage) UI.switchTab(stage.panels[0]);
+  }));
   document.getElementById("btnMobileNav").addEventListener("click", () => document.getElementById("sidebar").classList.toggle("open"));
   document.getElementById("btnProjectMenu").addEventListener("click", () => UI.switchTab("dataset"));
   document.getElementById("btnHelp").addEventListener("click", () => UI.openModal("helpModalOverlay"));
+  document.getElementById("workflowBar").addEventListener("click", (e) => {
+    const step = e.target.closest(".workflow-step");
+    if (!step) return;
+    const target = WORKFLOW_STEP_TARGETS[step.dataset.step];
+    if (target) UI.gotoPanel(target[0], target[1], target[2]);
+  });
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".btn-next-step");
+    if (!btn) return;
+    const row = btn.closest("[data-next-from]");
+    if (!row) return;
+    if (row.dataset.nextFrom === "report") { UI.switchTab("overview"); return; }
+    const idx = PANEL_ORDER.indexOf(row.dataset.nextFrom);
+    if (idx >= 0 && idx < PANEL_ORDER.length - 1) UI.switchTab(PANEL_ORDER[idx + 1]);
+  });
+  document.getElementById("ovBtnLoadDemo").addEventListener("click", () => {
+    loadFullDemo();
+    Utils.toast("Demo study loaded — DEMO DATA — REPLACE WITH EMPIRICAL DATA.", "success");
+    UI.renderOverview();
+  });
+  document.getElementById("ovBtnStartNew").addEventListener("click", () => {
+    document.getElementById("btnNewStudy").click();
+    UI.switchTab("research-question");
+  });
+  document.getElementById("ovBtnGuide").addEventListener("click", () => UI.openModal("helpModalOverlay"));
+  document.getElementById("ovLimitationsLink").addEventListener("click", (e) => {
+    e.preventDefault();
+    UI.switchTab("report");
+    document.getElementById("modelLimitations").scrollIntoView({ behavior: "smooth" });
+  });
   document.getElementById("btnCloseHelpModal").addEventListener("click", () => UI.closeModal("helpModalOverlay"));
   document.getElementById("btnCloseCalcModal").addEventListener("click", () => UI.closeModal("calcModalOverlay"));
   [document.getElementById("calcModalOverlay"), document.getElementById("helpModalOverlay")].forEach(ov => {
@@ -3262,6 +3371,7 @@ function fullRerender() {
   populateAnalysisSelectors(); renderDescriptiveChart();
   UI.renderReportStatics();
   UI.updateMiniDashboard();
+  UI.switchTab("overview");
 }
 
 /* ===================== BOOTSTRAP ===================== */
@@ -3295,5 +3405,6 @@ document.addEventListener("DOMContentLoaded", () => {
     try { loadFullDemo(); Utils.toast("Demo study loaded — DEMO DATA — REPLACE WITH EMPIRICAL DATA.", "success"); }
     catch (err) { console.error("Demo load failed", err); }
   }
+  UI.renderOverview();
   markDirty();
 });
