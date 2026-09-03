@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Public Space Research Laboratory</title>
+<meta name="description" content="A virtual experimental research instrument for exploring relationships between public-space design variables and model-based environmental and behavioral indicators." />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header class="app-header" role="banner">
+  <div class="header-left">
+    <h1 class="app-title">PUBLIC SPACE RESEARCH LABORATORY</h1>
+    <p class="app-subtitle">Virtual Experimental Environment for Public-Space Research</p>
+  </div>
+  <div class="header-right">
+    <div class="status-indicator" id="researchStatus" role="status" aria-live="polite">
+      <span class="status-dot status-ready" id="statusDot"></span>
+      <span id="statusText">READY</span>
+    </div>
+    <button class="btn btn-ghost" id="btnHelp" aria-label="How to use this instrument">? Guide</button>
+    <button class="btn btn-ghost" id="btnMobileNav" aria-label="Toggle navigation menu">☰ Menu</button>
+  </div>
+</header>
+
+<div class="workflow-bar" id="workflowBar" aria-label="Research workflow progress">
+  <div class="workflow-step" data-step="1"><span class="wf-num">1</span><span class="wf-label">Research Question</span></div>
+  <div class="workflow-step" data-step="2"><span class="wf-num">2</span><span class="wf-label">Variables</span></div>
+  <div class="workflow-step" data-step="3"><span class="wf-num">3</span><span class="wf-label">Baseline</span></div>
+  <div class="workflow-step" data-step="4"><span class="wf-num">4</span><span class="wf-label">Treatment</span></div>
+  <div class="workflow-step" data-step="5"><span class="wf-num">5</span><span class="wf-label">Lock Controls</span></div>
+  <div class="workflow-step" data-step="6"><span class="wf-num">6</span><span class="wf-label">Run Experiment</span></div>
+  <div class="workflow-step" data-step="7"><span class="wf-num">7</span><span class="wf-label">Observations</span></div>
+  <div class="workflow-step" data-step="8"><span class="wf-num">8</span><span class="wf-label">Analyze</span></div>
+  <div class="workflow-step" data-step="9"><span class="wf-num">9</span><span class="wf-label">Export Dataset</span></div>
+  <div class="workflow-step" data-step="10"><span class="wf-num">10</span><span class="wf-label">Research Draft</span></div>
+</div>
+
+<div class="app-shell">
+<nav class="sidebar" id="sidebar" aria-label="Main navigation">
+  <button class="nav-item active" data-tab="research-question" aria-current="page">
+    <span class="nav-icon">1</span><span>Research Question</span>
+  </button>
+  <button class="nav-item" data-tab="space-builder">
+    <span class="nav-icon">2</span><span>Space Builder</span>
+  </button>
+  <button class="nav-item" data-tab="variables">
+    <span class="nav-icon">3</span><span>Variables</span>
+  </button>
+  <button class="nav-item" data-tab="experiment">
+    <span class="nav-icon">4</span><span>Experiment</span>
+  </button>
+  <button class="nav-item" data-tab="observations">
+    <span class="nav-icon">5</span><span>Observations</span>
+  </button>
+  <button class="nav-item" data-tab="analysis">
+    <span class="nav-icon">6</span><span>Analysis</span>
+  </button>
+  <button class="nav-item" data-tab="dataset">
+    <span class="nav-icon">7</span><span>Dataset</span>
+  </button>
+  <button class="nav-item" data-tab="report">
+    <span class="nav-icon">8</span><span>Research Report</span>
+  </button>
+
+  <div class="sidebar-footer">
+    <div class="mini-dashboard" id="miniDashboard">
+      <div class="mini-row"><span>Quality Score</span><strong id="miniQuality">--</strong></div>
+      <div class="mini-row"><span>Dataset rows</span><strong id="miniRows">0</strong></div>
+      <div class="mini-row"><span>Trials</span><strong id="miniTrials">0</strong></div>
+    </div>
+    <button class="btn btn-block" id="btnProjectMenu">Project ▾</button>
+  </div>
+</nav>
+
+<main id="main-content" class="content">
+
+<!-- ================= RESEARCH QUESTION ================= -->
+<section class="panel active" id="panel-research-question" aria-labelledby="rq-heading">
+  <div class="panel-header">
+    <h2 id="rq-heading">1. Research Question</h2>
+    <p class="panel-desc">Define the scope of your inquiry before manipulating the virtual space. This information frames every subsequent module.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card span-2">
+      <h3>Study Definition</h3>
+      <div class="form-grid">
+        <label class="field">
+          <span>Research Project Title</span>
+          <input type="text" id="studyTitle" placeholder="e.g. Influence of Seating Configuration on Social Interaction Potential" />
+        </label>
+        <label class="field span-2">
+          <span>Research Question</span>
+          <textarea id="studyQuestion" rows="2" placeholder="How does seating configuration influence social interaction potential in a public plaza?"></textarea>
+        </label>
+        <label class="field span-2">
+          <span>Research Objective</span>
+          <textarea id="studyObjective" rows="2"></textarea>
+        </label>
+        <label class="field span-2">
+          <span>Research Hypothesis</span>
+          <textarea id="studyHypothesis" rows="2" placeholder="Clustered seating configurations produce greater social interaction potential than isolated seating configurations."></textarea>
+        </label>
+        <div class="field span-2">
+          <span>Research Type</span>
+          <div class="chip-group" id="researchTypeGroup" role="radiogroup" aria-label="Research type">
+            <button class="chip" data-value="Exploratory">Exploratory</button>
+            <button class="chip" data-value="Experimental">Experimental</button>
+            <button class="chip" data-value="Comparative">Comparative</button>
+            <button class="chip" data-value="Parametric">Parametric</button>
+          </div>
+        </div>
+        <label class="field">
+          <span>Independent Variable</span>
+          <input type="text" id="studyIV" placeholder="Seating configuration" />
+        </label>
+        <label class="field">
+          <span>Dependent Variable</span>
+          <input type="text" id="studyDV" placeholder="Social interaction potential" />
+        </label>
+        <label class="field span-2">
+          <span>Control Variables</span>
+          <input type="text" id="studyControls" placeholder="Space geometry, entrances, vegetation, lighting..." />
+        </label>
+        <label class="field span-2">
+          <span>Study Context</span>
+          <textarea id="studyContext" rows="2" placeholder="Urban plaza, temperate climate, weekday afternoon scenario..."></textarea>
+        </label>
+        <label class="field span-2">
+          <span>Researcher Notes</span>
+          <textarea id="studyNotes" rows="3"></textarea>
+        </label>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnSaveStudy">Save Study</button>
+        <button class="btn" id="btnLoadStudy">Load Study</button>
+        <button class="btn btn-danger-outline" id="btnResetStudy">Reset Study</button>
+        <button class="btn" id="btnLoadDemoStudy">Load Demo Study</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Positioning</h3>
+      <p class="hint">This laboratory is a <strong>virtual experimental research instrument</strong> for exploring relationships between public-space design variables and model-based environmental and behavioral indicators. It supports exploratory research, parametric studies, scenario comparison, controlled simulation, research-instrument prototyping, and observation / participant-response data collection.</p>
+      <p class="hint">It does <strong>not</strong> constitute a peer-reviewed validated instrument, a scientifically proven predictor, or a real-world behavioral simulator.</p>
+      <h3>Research Quality Check</h3>
+      <div id="qualityCheckList" class="check-list"></div>
+      <div class="big-metric"><span id="qualityCompletenessValue">0%</span><span class="big-metric-label">RESEARCH DESIGN COMPLETENESS</span></div>
+      <p class="hint small">Note: this measures design <em>completeness</em>, not scientific validity.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SPACE BUILDER ================= -->
+<section class="panel" id="panel-space-builder" aria-labelledby="sb-heading">
+  <div class="panel-header">
+    <h2 id="sb-heading">2. Virtual Public Space Builder</h2>
+    <p class="panel-desc">Construct and manipulate the spatial configuration. Drag objects to reposition them. All changes recalculate model-based indicators live.</p>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-group">
+      <label class="mini-field">Preset
+        <select id="presetSelect">
+          <option value="">— Select preset —</option>
+          <option value="open">01 · Open Plaza</option>
+          <option value="treelined">02 · Tree-Lined Plaza</option>
+          <option value="courtyard">03 · Courtyard Plaza</option>
+          <option value="seating">04 · Seating-Centered Plaza</option>
+          <option value="commercial">05 · Commercial Edge Plaza</option>
+          <option value="park">06 · Park-Like Space</option>
+          <option value="highdensity">07 · High-Density Urban Plaza</option>
+          <option value="lowdensity">08 · Low-Density Quiet Plaza</option>
+          <option value="pedestrian">09 · Pedestrian Plaza</option>
+          <option value="custom">10 · Custom</option>
+        </select>
+      </label>
+    </div>
+    <div class="toolbar-group" id="addToolGroup">
+      <span class="toolbar-label">Add:</span>
+      <button class="btn btn-sm" data-add="entrance">Entrance</button>
+      <button class="btn btn-sm" data-add="pathway">Pathway</button>
+      <button class="btn btn-sm" data-add="seat">Seating</button>
+      <button class="btn btn-sm" data-add="tree">Tree</button>
+      <button class="btn btn-sm" data-add="shade">Shade</button>
+      <button class="btn btn-sm" data-add="light">Light</button>
+      <button class="btn btn-sm" data-add="water">Water</button>
+      <button class="btn btn-sm" data-add="edge">Active Edge</button>
+      <button class="btn btn-sm" data-add="node">Activity Node</button>
+      <button class="btn btn-sm" data-add="obstacle">Obstacle</button>
+    </div>
+    <div class="toolbar-group">
+      <button class="btn btn-sm" id="btnUndo" title="Undo">↶ Undo</button>
+      <button class="btn btn-sm" id="btnRedo" title="Redo">↷ Redo</button>
+      <button class="btn btn-sm" id="btnRandomize">🎲 Randomize</button>
+      <button class="btn btn-sm" id="btnClearSpace">Clear</button>
+    </div>
+  </div>
+
+  <div class="builder-grid">
+    <div class="builder-side">
+      <div class="card">
+        <h3>Geometry</h3>
+        <label class="field-inline"><span>Width (m)</span><input type="number" id="geoWidth" min="10" max="200" value="40"/></label>
+        <label class="field-inline"><span>Length (m)</span><input type="number" id="geoLength" min="10" max="200" value="60"/></label>
+        <label class="field-inline"><span>Boundary Openness</span><input type="range" id="geoOpenness" min="0" max="100" value="60"/><output>60</output></label>
+        <label class="field-inline"><span>Enclosure Level</span><input type="range" id="geoEnclosure" min="0" max="100" value="40"/><output>40</output></label>
+      </div>
+      <div class="card">
+        <h3>Abstract Parameters</h3>
+        <p class="hint small">Continuous design parameters not represented as discrete objects.</p>
+        <label class="field-inline"><span>Path Directness</span><input type="range" id="parPathDirectness" min="0" max="100" value="70"/><output>70</output></label>
+        <label class="field-inline"><span>Path Connectivity</span><input type="range" id="parPathConnectivity" min="0" max="100" value="60"/><output>60</output></label>
+        <label class="field-inline"><span>Surface Continuity</span><input type="range" id="parSurfaceContinuity" min="0" max="100" value="80"/><output>80</output></label>
+        <label class="field-inline"><span>Crossing Complexity</span><input type="range" id="parCrossingComplexity" min="0" max="100" value="30"/><output>30</output></label>
+        <label class="field-inline"><span>Visual Obstruction</span><input type="range" id="parVisualObstruction" min="0" max="100" value="20"/><output>20</output></label>
+        <label class="field-inline"><span>Blind Spots</span><input type="range" id="parBlindSpots" min="0" max="100" value="15"/><output>15</output></label>
+        <label class="field-inline"><span>Noise Level (assumption)</span><input type="range" id="parNoise" min="0" max="100" value="35"/><output>35</output></label>
+        <label class="field-inline"><span>Crowding (assumption)</span><input type="range" id="parCrowding" min="0" max="100" value="25"/><output>25</output></label>
+        <label class="field-inline"><span>Hardscape Ratio</span><input type="range" id="parHardscape" min="0" max="100" value="55"/><output>55</output></label>
+        <label class="field-inline"><span>Lighting Brightness</span><input type="range" id="parBrightness" min="0" max="100" value="60"/><output>60</output></label>
+      </div>
+      <div class="card">
+        <h3>Time Condition (Scenario Assumption)</h3>
+        <div class="chip-group" id="timeConditionGroup">
+          <button class="chip" data-value="Morning">Morning</button>
+          <button class="chip active" data-value="Afternoon">Afternoon</button>
+          <button class="chip" data-value="Evening">Evening</button>
+          <button class="chip" data-value="Night">Night</button>
+        </div>
+        <p class="hint small">Adjusts lighting / activity / shade weighting assumptions. Labeled as scenario assumption, not sensor data.</p>
+      </div>
+    </div>
+
+    <div class="builder-canvas-wrap">
+      <div class="canvas-toolbar">
+        <span class="toolbar-label">Heatmap:</span>
+        <select id="heatmapSelect">
+          <option value="none">None</option>
+          <option value="accessibility">Accessibility</option>
+          <option value="visibility">Visibility</option>
+          <option value="activity">Activity Potential</option>
+          <option value="social">Social Interaction Potential</option>
+          <option value="comfort">Comfort Potential</option>
+        </select>
+        <label class="mini-field">Opacity <input type="range" id="heatmapOpacity" min="0" max="100" value="55"/></label>
+        <span class="canvas-note">Model visualization — not field observation.</span>
+      </div>
+      <div class="canvas-frame">
+        <svg id="spaceCanvas" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Virtual public space canvas"></svg>
+      </div>
+      <p class="hint small">Click an object to select and edit its properties. Drag to move. Delete key removes the selected object.</p>
+    </div>
+
+    <div class="builder-side">
+      <div class="card" id="propertiesPanel">
+        <h3>Object Properties</h3>
+        <div id="propertiesContent" class="properties-content">
+          <p class="hint">No object selected. Click an object on the canvas, or add one using the toolbar above.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Snapshots</h3>
+        <div class="action-row">
+          <button class="btn btn-sm" id="btnSaveSnapshot">Save Snapshot</button>
+        </div>
+        <div id="snapshotList" class="mini-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VARIABLES ================= -->
+<section class="panel" id="panel-variables" aria-labelledby="var-heading">
+  <div class="panel-header">
+    <h2 id="var-heading">3. Variables Laboratory &amp; Public Space Quality Model</h2>
+    <p class="panel-desc">Every indicator below is a <strong>composite model-based indicator</strong> calculated transparently from the current space configuration. Use "View Calculation" to inspect formulas, weights, and raw values.</p>
+  </div>
+
+  <div class="quality-hero card">
+    <div class="quality-score-ring" id="qualityRing">
+      <span id="qualityScoreValue">--</span>
+      <span class="quality-score-label">PUBLIC SPACE QUALITY<br/>Composite Model-Based Indicator (0–100)</span>
+    </div>
+    <div class="quality-breakdown" id="qualityBreakdown"></div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn" id="btnDefaultWeights">Default Weights</button>
+    <button class="btn" id="btnCustomWeights">Enable Custom Weights</button>
+    <button class="btn" id="btnNormalizeWeights">Normalize Weights</button>
+    <button class="btn btn-danger-outline" id="btnResetWeights">Reset Weights</button>
+  </div>
+
+  <div id="indicatorCategories" class="indicator-categories"></div>
+</section>
+
+<!-- ================= EXPERIMENT ================= -->
+<section class="panel" id="panel-experiment" aria-labelledby="exp-heading">
+  <div class="panel-header">
+    <h2 id="exp-heading">4. Experiment Design</h2>
+    <p class="panel-desc">Design controlled, parametric, and multi-condition experiments. Duplicate the baseline, change only the independent variable, and lock control variables.</p>
+  </div>
+
+  <div class="tab-strip" id="expTabStrip">
+    <button class="tab-btn active" data-exptab="design">Design</button>
+    <button class="tab-btn" data-exptab="controlled">Controlled (Baseline / Treatment)</button>
+    <button class="tab-btn" data-exptab="parametric">Parametric Study</button>
+    <button class="tab-btn" data-exptab="multicondition">Multi-Condition</button>
+    <button class="tab-btn" data-exptab="replication">Replication</button>
+  </div>
+
+  <div class="exp-tab-panel active" data-exptabpanel="design">
+    <div class="card">
+      <h3>Experiment Definition</h3>
+      <div class="form-grid">
+        <label class="field"><span>Experiment ID</span><input type="text" id="expId" readonly /></label>
+        <label class="field"><span>Experiment Name</span><input type="text" id="expName" /></label>
+        <label class="field span-2"><span>Research Question</span><input type="text" id="expQuestion" /></label>
+        <label class="field span-2"><span>Hypothesis</span><input type="text" id="expHypothesis" /></label>
+        <label class="field"><span>Independent Variable</span><input type="text" id="expIV" /></label>
+        <label class="field"><span>Dependent Variable</span><input type="text" id="expDV" /></label>
+        <label class="field span-2"><span>Control Variables</span><input type="text" id="expControls" /></label>
+        <label class="field"><span>Number of Trials</span><input type="number" id="expTrials" min="1" max="50" value="5" /></label>
+        <label class="field"><span>Replication Count</span><input type="number" id="expReplication" min="1" max="20" value="3" /></label>
+        <label class="field"><span>Randomization Seed</span><input type="number" id="expSeed" value="12345" /></label>
+        <label class="field span-2"><span>Notes</span><textarea id="expNotes" rows="2"></textarea></label>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnCreateExperiment">Create / Update Experiment</button>
+        <button class="btn" id="btnLoadDemoExperiment">Load Demo Experiment</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Experiment List</h3>
+      <div id="experimentList" class="mini-list"></div>
+    </div>
+  </div>
+
+  <div class="exp-tab-panel" data-exptabpanel="controlled">
+    <div class="card">
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnSetBaseline">Set Current Space as BASELINE</button>
+        <button class="btn" id="btnDuplicateToTreatment">Duplicate Baseline → Treatment</button>
+        <button class="btn" id="btnLockControls">🔒 Lock Control Variables</button>
+        <span id="lockIndicator" class="lock-indicator">UNLOCKED</span>
+      </div>
+      <p class="hint small">Workflow: set the baseline, duplicate it to treatment, then edit <em>only</em> the independent variable in the Treatment workspace. Locked control variables will warn you if changed.</p>
+    </div>
+    <div class="side-by-side">
+      <div class="card">
+        <h3>Baseline</h3>
+        <div id="baselineSummary" class="condition-summary">No baseline set.</div>
+      </div>
+      <div class="card">
+        <h3>Treatment</h3>
+        <div id="treatmentSummary" class="condition-summary">No treatment set.</div>
+        <button class="btn btn-sm" id="btnEditTreatment">Edit Treatment in Space Builder</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Run Controlled Experiment</h3>
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnRunControlled">Run Baseline vs Treatment</button>
+      </div>
+      <div id="controlledResults"></div>
+    </div>
+  </div>
+
+  <div class="exp-tab-panel" data-exptabpanel="parametric">
+    <div class="card">
+      <h3>Parametric Study</h3>
+      <div class="form-grid">
+        <label class="field"><span>Independent Variable</span>
+          <select id="paramVariable">
+            <option value="treeCount">Tree Count</option>
+            <option value="seatCount">Seating Count</option>
+            <option value="entranceCount">Entrance Count</option>
+            <option value="lightCount">Lighting Count</option>
+            <option value="parPathDirectness">Path Directness</option>
+            <option value="parHardscape">Hardscape Ratio</option>
+          </select>
+        </label>
+        <label class="field"><span>Levels (comma-separated)</span><input type="text" id="paramLevels" value="0,2,4,6,8,10" /></label>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnRunParametric">Run Parametric Study</button>
+      </div>
+      <div id="paramResultsTable"></div>
+      <div class="chart-wrap"><svg id="paramChart" viewBox="0 0 600 300"></svg></div>
+    </div>
+
+    <div class="card">
+      <h3>Sensitivity Analysis</h3>
+      <div class="form-grid">
+        <label class="field"><span>Independent Variable</span>
+          <select id="sensVariable">
+            <option value="treeCount">Tree Count</option>
+            <option value="seatCount">Seating Count</option>
+            <option value="entranceCount">Entrance Count</option>
+            <option value="lightCount">Lighting Count</option>
+          </select>
+        </label>
+        <label class="field"><span>Dependent Indicator</span>
+          <select id="sensIndicator">
+            <option value="comfort">Environmental Comfort Index</option>
+            <option value="social">Social Interaction Potential</option>
+            <option value="accessibility">Accessibility Index</option>
+            <option value="quality">Public Space Quality Score</option>
+          </select>
+        </label>
+      </div>
+      <div class="action-row"><button class="btn btn-primary" id="btnRunSensitivity">Run Sensitivity Analysis</button></div>
+      <div id="sensResultsTable"></div>
+      <div class="chart-wrap"><svg id="sensChart" viewBox="0 0 600 300"></svg></div>
+      <p class="hint" id="sensInterpretation"></p>
+    </div>
+  </div>
+
+  <div class="exp-tab-panel" data-exptabpanel="multicondition">
+    <div class="card">
+      <h3>Multi-Condition Experiment (up to 10 conditions)</h3>
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnAddCondition">+ Add Condition from Current Space</button>
+      </div>
+      <div id="conditionList" class="mini-list"></div>
+      <div class="chart-wrap"><svg id="conditionChart" viewBox="0 0 600 320"></svg></div>
+      <div id="conditionComparisonTable"></div>
+    </div>
+  </div>
+
+  <div class="exp-tab-panel" data-exptabpanel="replication">
+    <div class="card">
+      <h3>Stochastic Simulation</h3>
+      <label class="field-inline"><span>Enable randomized model variation</span>
+        <input type="checkbox" id="stochasticToggle" />
+      </label>
+      <label class="field-inline"><span>Variation Level</span>
+        <select id="stochasticLevel">
+          <option value="0">0%</option>
+          <option value="1">1%</option>
+          <option value="5" selected>5%</option>
+          <option value="10">10%</option>
+        </select>
+      </label>
+      <p class="hint small">"Randomized model variation" is a synthetic noise term applied to computed indicators. It does not represent measured human behavioral variability.</p>
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnRunTrials">Run Replication Trials</button>
+      </div>
+      <div id="replicationTable"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OBSERVATIONS ================= -->
+<section class="panel" id="panel-observations" aria-labelledby="obs-heading">
+  <div class="panel-header">
+    <h2 id="obs-heading">5. Observations &amp; Participant Responses</h2>
+    <p class="panel-desc">Record researcher-entered field observations and participant survey responses. These are distinct from simulated indicators.</p>
+  </div>
+
+  <div class="tab-strip">
+    <button class="tab-btn active" data-obstab="observation">Observation Sheet</button>
+    <button class="tab-btn" data-obstab="participant">Participant Responses</button>
+  </div>
+
+  <div class="obs-tab-panel active" data-obstabpanel="observation">
+    <div class="card">
+      <h3>New Observation <span class="badge badge-empirical">Researcher-entered observation</span></h3>
+      <div class="form-grid">
+        <label class="field"><span>Location</span><input type="text" id="obsLocation" placeholder="e.g. North seating cluster" /></label>
+        <label class="field"><span>Condition</span><input type="text" id="obsCondition" placeholder="e.g. Baseline / Treatment A" /></label>
+        <label class="field"><span>Pedestrian Count</span><input type="number" id="obsPedestrians" min="0" /></label>
+        <label class="field"><span>Seated People</span><input type="number" id="obsSeated" min="0" /></label>
+        <label class="field"><span>Standing People</span><input type="number" id="obsStanding" min="0" /></label>
+        <label class="field"><span>Walking People</span><input type="number" id="obsWalking" min="0" /></label>
+        <label class="field"><span>Groups</span><input type="number" id="obsGroups" min="0" /></label>
+        <label class="field"><span>Solo Users</span><input type="number" id="obsSolo" min="0" /></label>
+        <label class="field"><span>Interactions Observed</span><input type="number" id="obsInteractions" min="0" /></label>
+        <label class="field"><span>Avg. Duration of Stay (min)</span><input type="number" id="obsDuration" min="0" /></label>
+        <label class="field span-2"><span>Observed Activities</span><input type="text" id="obsActivities" placeholder="Comma-separated" /></label>
+        <label class="field"><span>Conflicts Observed</span><input type="number" id="obsConflicts" min="0" /></label>
+        <label class="field"><span>Noise Perception (1–5)</span><input type="number" id="obsNoise" min="1" max="5" /></label>
+        <label class="field"><span>Comfort Rating (1–5)</span><input type="number" id="obsComfort" min="1" max="5" /></label>
+        <label class="field"><span>Safety Perception (1–5)</span><input type="number" id="obsSafety" min="1" max="5" /></label>
+        <label class="field span-2"><span>Accessibility Problems</span><input type="text" id="obsAccessProblems" /></label>
+        <label class="field span-2"><span>Notes</span><textarea id="obsNotes" rows="2"></textarea></label>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnAddObservation">Record Observation</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Observation Log</h3>
+      <div class="table-scroll"><table id="observationTable"><thead></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="obs-tab-panel" data-obstabpanel="participant">
+    <div class="card">
+      <h3>Questionnaire <span class="badge badge-participant">Participant-reported response</span></h3>
+      <p class="hint small">Likert scale 1 (Strongly disagree) – 5 (Strongly agree). No personally identifiable information is collected — participants are recorded by anonymous ID only (e.g. P001).</p>
+      <div id="questionList" class="mini-list"></div>
+      <div class="action-row">
+        <input type="text" id="newQuestionText" placeholder="Add a custom Likert question..." class="grow-input"/>
+        <button class="btn btn-sm" id="btnAddQuestion">Add Question</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Record Response</h3>
+      <div class="form-grid">
+        <label class="field"><span>Participant ID</span><input type="text" id="participantId" readonly /></label>
+        <label class="field"><span>Condition</span><input type="text" id="participantCondition" placeholder="Baseline / Treatment A" /></label>
+      </div>
+      <div id="likertForm"></div>
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnSubmitResponse">Submit Response</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Response Summary</h3>
+      <div id="responseSummary"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ANALYSIS ================= -->
+<section class="panel" id="panel-analysis" aria-labelledby="ana-heading">
+  <div class="panel-header">
+    <h2 id="ana-heading">6. Data Analysis Dashboard</h2>
+    <p class="panel-desc">Descriptive statistics, comparison, correlation and effect-size tools computed from your collected/model data.</p>
+  </div>
+
+  <div class="card causality-warning">
+    <strong>CAUTION:</strong> Results here arise substantially from the computational model and researcher-entered data. They do not by themselves establish causality, and should not be interpreted as empirical evidence of real-world human behavior without independent validation.
+  </div>
+
+  <div class="tab-strip">
+    <button class="tab-btn active" data-anatab="descriptive">Descriptive Charts</button>
+    <button class="tab-btn" data-anatab="comparison">Scenario Comparison</button>
+    <button class="tab-btn" data-anatab="correlation">Correlation Explorer</button>
+    <button class="tab-btn" data-anatab="matrix">Comparison Matrix</button>
+  </div>
+
+  <div class="ana-tab-panel active" data-anatabpanel="descriptive">
+    <div class="card">
+      <h3>Select dataset field</h3>
+      <div class="form-grid">
+        <label class="field"><span>Numeric field</span>
+          <select id="descField"></select>
+        </label>
+        <label class="field"><span>Chart type</span>
+          <select id="descChartType">
+            <option value="bar">Bar Chart</option>
+            <option value="histogram">Histogram</option>
+            <option value="box">Distribution (box-style)</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Chart</h3>
+      <div class="chart-wrap"><svg id="descChart" viewBox="0 0 700 320"></svg></div>
+      <div id="descStats" class="stats-grid"></div>
+    </div>
+    <div class="card">
+      <h3>Radar — Indicator Profile</h3>
+      <div class="chart-wrap"><svg id="radarChart" viewBox="0 0 400 400"></svg></div>
+    </div>
+  </div>
+
+  <div class="ana-tab-panel" data-anatabpanel="comparison">
+    <div class="card">
+      <h3>Scenario A vs Scenario B</h3>
+      <div class="form-grid">
+        <label class="field"><span>Scenario A (snapshot/condition)</span><select id="scenarioA"></select></label>
+        <label class="field"><span>Scenario B (snapshot/condition)</span><select id="scenarioB"></select></label>
+      </div>
+      <div class="action-row"><button class="btn btn-primary" id="btnCompareScenarios">Compare</button></div>
+      <div id="scenarioCompareResult"></div>
+    </div>
+  </div>
+
+  <div class="ana-tab-panel" data-anatabpanel="correlation">
+    <div class="card">
+      <h3>Correlation Explorer</h3>
+      <div class="form-grid">
+        <label class="field"><span>Variable X</span><select id="corrX"></select></label>
+        <label class="field"><span>Variable Y</span><select id="corrY"></select></label>
+      </div>
+      <div class="action-row"><button class="btn btn-primary" id="btnRunCorrelation">Compute Correlation</button></div>
+      <div id="corrResult"></div>
+      <div class="chart-wrap"><svg id="scatterChart" viewBox="0 0 500 400"></svg></div>
+      <p class="hint">Correlation in simulated/model-generated data does not establish real-world causation.</p>
+    </div>
+  </div>
+
+  <div class="ana-tab-panel" data-anatabpanel="matrix">
+    <div class="card">
+      <h3>Research Comparison Matrix</h3>
+      <div id="comparisonMatrixTable"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DATASET ================= -->
+<section class="panel" id="panel-dataset" aria-labelledby="ds-heading">
+  <div class="panel-header">
+    <h2 id="ds-heading">7. Dataset Management</h2>
+    <p class="panel-desc">All trial results, observations, and participant responses consolidated into one reproducible dataset table.</p>
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <input type="text" id="datasetSearch" placeholder="Search dataset..." class="grow-input" />
+      <select id="datasetFilterType">
+        <option value="">All observation types</option>
+        <option value="simulation">Simulation</option>
+        <option value="observation">Field Observation</option>
+        <option value="participant">Participant Response</option>
+      </select>
+      <select id="datasetSort">
+        <option value="timestamp">Sort: Timestamp</option>
+        <option value="condition">Sort: Condition</option>
+        <option value="dependent_value">Sort: Dependent Value</option>
+      </select>
+      <button class="btn btn-sm" id="btnAddDatasetRow">+ Add Row</button>
+      <button class="btn btn-sm btn-danger-outline" id="btnClearDataset">Clear Data</button>
+    </div>
+    <div class="table-scroll"><table id="datasetTable"><thead></thead><tbody></tbody></table></div>
+    <div class="action-row">
+      <button class="btn btn-primary" id="btnExportCSV">Export CSV</button>
+      <button class="btn" id="btnExportJSON">Export JSON</button>
+      <button class="btn" id="btnExportLog">Export Experiment Log</button>
+      <span class="hint small">CSV columns are formatted for Excel, SPSS, R, Python, JASP, and Jamovi.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Experiment Log</h3>
+    <div class="table-scroll"><table id="logTable"><thead><tr><th>Time</th><th>Action</th><th>Variable</th><th>Old</th><th>New</th><th>Experiment</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <div class="card">
+    <h3>Project Management</h3>
+    <div class="action-row">
+      <button class="btn" id="btnNewStudy">New Study</button>
+      <button class="btn" id="btnExportProject">Export All Project Data</button>
+      <button class="btn" id="btnImportProject">Import Project Data</button>
+      <input type="file" id="importFileInput" accept="application/json" hidden />
+      <button class="btn btn-danger-outline" id="btnResetProject">Reset Project</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REPORT ================= -->
+<section class="panel" id="panel-report" aria-labelledby="rep-heading">
+  <div class="panel-header">
+    <h2 id="rep-heading">8. Research Report &amp; Reproducibility</h2>
+    <p class="panel-desc">Generate a structured research draft and reproducibility manifest from your study data.</p>
+  </div>
+
+  <div class="tab-strip">
+    <button class="tab-btn active" data-reptab="summary">Research Summary</button>
+    <button class="tab-btn" data-reptab="paper">Research Paper Builder</button>
+    <button class="tab-btn" data-reptab="reproducibility">Reproducibility</button>
+    <button class="tab-btn" data-reptab="dashboard">Final Dashboard</button>
+  </div>
+
+  <div class="rep-tab-panel active" data-reptabpanel="summary">
+    <div class="card">
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnGenerateSummary">Generate Research Summary</button>
+        <button class="btn" id="btnCopySummary">Copy</button>
+        <button class="btn" id="btnDownloadSummary">Download</button>
+      </div>
+      <pre id="summaryOutput" class="report-output"></pre>
+    </div>
+  </div>
+
+  <div class="rep-tab-panel" data-reptabpanel="paper">
+    <div class="card">
+      <p class="hint">Generates a structured research draft requiring researcher verification, empirical validation, and appropriate citation. It does not automatically generate a publishable paper.</p>
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnGeneratePaper">Generate Paper Draft</button>
+        <button class="btn" id="btnCopyPaper">Copy Report</button>
+        <button class="btn" id="btnDownloadPaper">Download Report</button>
+      </div>
+      <pre id="paperOutput" class="report-output"></pre>
+    </div>
+  </div>
+
+  <div class="rep-tab-panel" data-reptabpanel="reproducibility">
+    <div class="card">
+      <div id="reproPanel"></div>
+      <div class="action-row">
+        <button class="btn btn-primary" id="btnExportConfig">Export Experiment Configuration</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="rep-tab-panel" data-reptabpanel="dashboard">
+    <div class="card" id="finalDashboard"></div>
+  </div>
+
+  <div class="card model-limitations" id="modelLimitations">
+    <h3>Model Limitations &amp; Assumptions <span class="badge badge-warning">Always read this</span></h3>
+    <ul>
+      <li>This laboratory is a computational research prototype.</li>
+      <li>Model-based indicators are not substitutes for field measurements.</li>
+      <li>Simulated behavior is not equivalent to observed human behavior.</li>
+      <li>Results depend on model assumptions and weighting.</li>
+      <li>Empirical validation is required before treating indicators as validated measurements.</li>
+      <li>Correlation does not establish causation.</li>
+      <li>Composite scores should be interpreted in relation to their component variables.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- Model Limitations persistent footer strip -->
+<div class="limitations-strip" id="limitationsStrip">
+  <span>⚠ Model-based indicators are computational estimates, not validated measurements. Correlation ≠ causation.</span>
+  <button id="btnJumpLimitations" class="btn btn-ghost btn-xs">Read full statement</button>
+</div>
+
+<!-- Modal: View Calculation -->
+<div class="modal-overlay" id="calcModalOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="calcModalTitle">
+    <div class="modal-header">
+      <h3 id="calcModalTitle">Calculation Detail</h3>
+      <button class="btn btn-ghost btn-xs" id="btnCloseCalcModal" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body" id="calcModalBody"></div>
+  </div>
+</div>
+
+<!-- Modal: Help / Guide -->
+<div class="modal-overlay" id="helpModalOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
+    <div class="modal-header">
+      <h3 id="helpModalTitle">Instrument Guide</h3>
+      <button class="btn btn-ghost btn-xs" id="btnCloseHelpModal" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <ol class="guide-list">
+        <li><strong>Research Question</strong> — define your study, IV/DV, hypothesis.</li>
+        <li><strong>Space Builder</strong> — configure the plaza, or load a preset. Set as Baseline.</li>
+        <li><strong>Experiment → Controlled</strong> — duplicate to Treatment, change only the IV, lock controls, run.</li>
+        <li><strong>Observations</strong> — log researcher observations and/or participant Likert responses.</li>
+        <li><strong>Analysis</strong> — inspect charts, correlation, comparison matrix.</li>
+        <li><strong>Dataset</strong> — review, edit, export CSV/JSON.</li>
+        <li><strong>Research Report</strong> — generate a draft summary, paper outline, and reproducibility manifest.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
